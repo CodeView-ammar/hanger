@@ -132,18 +132,24 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     
     case productDetailsScreenRoute:
   return MaterialPageRoute(
-    builder: (context) {
-      final args = settings.arguments as Map<String, dynamic>;
-      bool isAvailable = args["isAvailable"] ?? true; // Default to true if not provided
-      int isProduct = args["id"] ?? 0; // Default to 0 if not provided
+  builder: (context) {
+    final args = settings.arguments as Map<String, dynamic>?;
+    bool isAvailable = args?["isAvailable"] ?? true; // Default to true if not provided
+    int id = args?["id"] ?? 0; // Default to 0 if not provided
+    String name = args?["name"] ?? "";
+    String image = args?["image"] ?? "";
+    String address = args?["address"] ?? "";
 
-      return ProductDetailsScreen(
-        isAvailable: isAvailable,
-        id: isProduct,
-      );
-    },
-  );
-    case productReviewsScreenRoute:
+    return ProductDetailsScreen(
+      id: id,
+      isAvailable: isAvailable,
+      name: name,
+      image: image,
+      address: address,
+    );
+  },
+);
+case productReviewsScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const ProductReviewsScreen(),
       );

@@ -6,16 +6,19 @@ import 'skleton/skelton.dart';
 
 class NetworkImageWithLoader extends StatelessWidget {
   final BoxFit fit;
+  final String src;
+  final double radius;
+  final double height; // تم تعديلها لتكون double
+  final double width;  // تم تعديلها لتكون double
 
   const NetworkImageWithLoader(
     this.src, {
     super.key,
     this.fit = BoxFit.cover,
     this.radius = defaultPadding,
+    this.height = 0, // قيمة افتراضية لتكون 0
+    this.width = 0,  // قيمة افتراضية لتكون 0
   });
-
-  final String src;
-  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,8 @@ class NetworkImageWithLoader extends StatelessWidget {
         fit: fit,
         imageUrl: src,
         imageBuilder: (context, imageProvider) => Container(
+          height: height > 0 ? height : null, // إذا كانت القيمة أكبر من 0 سيتم استخدامها
+          width: width > 0 ? width : null,   // إذا كانت القيمة أكبر من 0 سيتم استخدامها
           decoration: BoxDecoration(
             image: DecorationImage(
               image: imageProvider,
@@ -32,8 +37,8 @@ class NetworkImageWithLoader extends StatelessWidget {
             ),
           ),
         ),
-        placeholder: (context, url) => const Skeleton(),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+        placeholder: (context, url) => const Skeleton(), // يظهر عند التحميل
+        errorWidget: (context, url, error) => const Icon(Icons.error), // يظهر عند حدوث خطأ
       ),
     );
   }

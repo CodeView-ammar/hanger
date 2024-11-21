@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shop/route/screen_export.dart';
 
 import '../../../../constants.dart';
 
@@ -19,13 +18,13 @@ class CategoryModel {
 List<CategoryModel> demoCategories = [
   CategoryModel(name: "كل الفئات"),
   CategoryModel(
-      name: "للبيع",
+      name: "ستائر",
       svgSrc: "assets/icons/Sale.svg",
-      route: onSaleScreenRoute),
-  CategoryModel(name: "غسل", svgSrc: "assets/icons/Man.svg"),
-  CategoryModel(name: "كي", svgSrc: "assets/icons/Woman.svg"),
+      route: null),
+  CategoryModel(name: "فرش", svgSrc: "assets/icons/Man.svg"),
+  CategoryModel(name: "ملايات", svgSrc: "assets/icons/Woman.svg"),
   CategoryModel(
-      name: "سجاد", svgSrc: "assets/icons/Child.svg", route: kidsScreenRoute),
+      name: "ثياب", svgSrc: "assets/icons/Child.svg", route: null),
 ];
 // End For Preview
 

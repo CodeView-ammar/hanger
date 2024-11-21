@@ -81,7 +81,7 @@ class _BestSellersState extends State<BestSellers> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // عدد الأعمدة
                   childAspectRatio: 0.75, // نسبة الطول إلى العرض
-                  crossAxisSpacing: defaultPadding, // المسافة بين الأعمدة
+                  crossAxisSpacing: 1, // المسافة بين الأعمدة
                   mainAxisSpacing: defaultPadding, // المسافة بين الصفوف
                 ),
                 itemCount: demoBestSellersProducts.length,
@@ -106,6 +106,9 @@ class _BestSellersState extends State<BestSellers> {
                         arguments: {
                           "isAvailable": index.isEven,
                           "id": demoBestSellersProducts[index].id,
+                          "name": demoBestSellersProducts[index].name,
+                          "image": demoBestSellersProducts[index].image,
+                          "address": demoBestSellersProducts[index].address,
                         },
                       );
                     },
