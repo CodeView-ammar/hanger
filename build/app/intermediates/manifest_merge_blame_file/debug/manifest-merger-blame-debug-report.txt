@@ -1,0 +1,280 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.hanger_m"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="34" />
+10    <!--
+11         The INTERNET permission is required for development. Specifically,
+12         the Flutter tool needs it to communicate with the running application
+13         to allow setting breakpoints, to provide hot reload, etc.
+14    -->
+15    <uses-permission android:name="android.permission.INTERNET" />
+15-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:4:5-67
+15-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:4:22-64
+16    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+16-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:2:5-78
+16-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:2:22-76
+17    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+17-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:3:5-80
+17-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:3:22-78
+18    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+18-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:5:5-79
+18-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:5:22-77
+19    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+19-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:6:5-80
+19-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:6:22-78
+20    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+20-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:7:5-79
+20-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:7:22-77
+21    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+21-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:8:5-80
+21-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:8:22-78
+22    <uses-permission android:name="android.permission.VIBRATE" />
+22-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:9:5-65
+22-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:9:22-63
+23
+24    <queries>
+24-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:39:5-44:15
+25        <intent>
+25-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:40:9-43:18
+26            <action android:name="android.intent.action.PROCESS_TEXT" />
+26-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:41:13-72
+26-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:41:21-70
+27
+28            <data android:mimeType="text/plain" />
+28-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:42:13-50
+28-->E:\hinger\hanger_m\android\app\src\main\AndroidManifest.xml:42:19-48
+29        </intent>
+30        <!-- Needs to be explicitly declared on Android R+ -->
+31        <package android:name="com.google.android.apps.maps" />
+31-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:33:9-64
+31-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:33:18-61
+32    </queries> <!-- Include required permissions for Google Maps API to run. -->
+33    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+33-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:23:5-79
+33-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:23:22-76
+34
+35    <uses-feature
+35-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:26:5-28:35
+36        android:glEsVersion="0x00020000"
+36-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:27:9-41
+37        android:required="true" />
+37-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:28:9-32
+38
+39    <permission
+39-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+40        android:name="com.example.hanger_m.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+40-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+41        android:protectionLevel="signature" />
+41-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+42
+43    <uses-permission android:name="com.example.hanger_m.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+43-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+43-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+44
+45    <application
+46        android:name="android.app.Application"
+47        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+47-->[androidx.core:core:1.13.1] C:\Users\Power Plus\.gradle\caches\transforms-3\c666c258fca39b3353b46678a6b928ab\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+48        android:debuggable="true"
+49        android:enableOnBackInvokedCallback="true"
+50        android:extractNativeLibs="true"
+51        android:icon="@mipmap/ic_launcher"
+52        android:label="hanger_m" > <!-- Enable OnBackInvokedCallback -->
+53        <activity
+54            android:name="com.example.hanger_m.MainActivity"
+55            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+56            android:exported="true"
+57            android:hardwareAccelerated="true"
+58            android:launchMode="singleTop"
+59            android:taskAffinity=""
+60            android:theme="@style/LaunchTheme"
+61            android:windowSoftInputMode="adjustResize" >
+62            <meta-data
+63                android:name="io.flutter.embedding.android.NormalTheme"
+64                android:resource="@style/NormalTheme" />
+65
+66            <intent-filter>
+67                <action android:name="android.intent.action.MAIN" />
+68
+69                <category android:name="android.intent.category.LAUNCHER" />
+70            </intent-filter>
+71        </activity>
+72
+73        <meta-data
+74            android:name="flutterEmbedding"
+75            android:value="2" />
+76        <meta-data
+77            android:name="com.google.android.geo.API_KEY"
+78            android:value="AIzaSyDlQrdG8xZxzh1XhQQ0V3Y5rstuOoj0jdg" />
+79
+80        <provider
+80-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:9-17:20
+81            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
+81-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-82
+82            android:authorities="com.example.hanger_m.flutter.image_provider"
+82-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-74
+83            android:exported="false"
+83-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-37
+84            android:grantUriPermissions="true" >
+84-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-47
+85            <meta-data
+85-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:14:13-16:75
+86                android:name="android.support.FILE_PROVIDER_PATHS"
+86-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:15:17-67
+87                android:resource="@xml/flutter_image_picker_file_paths" />
+87-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:16:17-72
+88        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
+89        <service
+89-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:19:9-31:19
+90            android:name="com.google.android.gms.metadata.ModuleDependencies"
+90-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:20:13-78
+91            android:enabled="false"
+91-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:21:13-36
+92            android:exported="false" >
+92-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:22:13-37
+93            <intent-filter>
+93-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:24:13-26:29
+94                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+94-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:25:17-94
+94-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:25:25-91
+95            </intent-filter>
+96
+97            <meta-data
+97-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:28:13-30:36
+98                android:name="photopicker_activity:0:required"
+98-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:29:17-63
+99                android:value="" />
+99-->[:image_picker_android] E:\hinger\hanger_m\build\image_picker_android\intermediates\merged_manifest\debug\AndroidManifest.xml:30:17-33
+100        </service>
+101        <service
+101-->[:geolocator_android] E:\hinger\hanger_m\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-12:56
+102            android:name="com.baseflow.geolocator.GeolocatorLocationService"
+102-->[:geolocator_android] E:\hinger\hanger_m\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-77
+103            android:enabled="true"
+103-->[:geolocator_android] E:\hinger\hanger_m\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-35
+104            android:exported="false"
+104-->[:geolocator_android] E:\hinger\hanger_m\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-37
+105            android:foregroundServiceType="location" />
+105-->[:geolocator_android] E:\hinger\hanger_m\build\geolocator_android\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-53
+106        <service
+106-->[:location] E:\hinger\hanger_m\build\location\intermediates\merged_manifest\debug\AndroidManifest.xml:11:9-15:56
+107            android:name="com.lyokone.location.FlutterLocationService"
+107-->[:location] E:\hinger\hanger_m\build\location\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-71
+108            android:enabled="true"
+108-->[:location] E:\hinger\hanger_m\build\location\intermediates\merged_manifest\debug\AndroidManifest.xml:13:13-35
+109            android:exported="false"
+109-->[:location] E:\hinger\hanger_m\build\location\intermediates\merged_manifest\debug\AndroidManifest.xml:14:13-37
+110            android:foregroundServiceType="location" />
+110-->[:location] E:\hinger\hanger_m\build\location\intermediates\merged_manifest\debug\AndroidManifest.xml:15:13-53
+111
+112        <activity
+112-->[:url_launcher_android] E:\hinger\hanger_m\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-11:74
+113            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+113-->[:url_launcher_android] E:\hinger\hanger_m\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-74
+114            android:exported="false"
+114-->[:url_launcher_android] E:\hinger\hanger_m\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-37
+115            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" /> <!-- Needs to be explicitly declared on P+ -->
+115-->[:url_launcher_android] E:\hinger\hanger_m\build\url_launcher_android\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-71
+116        <uses-library
+116-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:39:9-41:40
+117            android:name="org.apache.http.legacy"
+117-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:40:13-50
+118            android:required="false" />
+118-->[com.google.android.gms:play-services-maps:18.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\8bbca67cc5a32c5ad0e6edc351921bed\transformed\jetified-play-services-maps-18.2.0\AndroidManifest.xml:41:13-37
+119
+120        <activity
+120-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\bb9d59e21b7884666623ba570b979574\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:9-22:45
+121            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+121-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\bb9d59e21b7884666623ba570b979574\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:20:19-85
+122            android:exported="false"
+122-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\bb9d59e21b7884666623ba570b979574\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:22:19-43
+123            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+123-->[com.google.android.gms:play-services-base:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\bb9d59e21b7884666623ba570b979574\transformed\jetified-play-services-base-18.3.0\AndroidManifest.xml:21:19-78
+124
+125        <meta-data
+125-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\96004e15647bc525170b7742251f128d\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:21:9-23:69
+126            android:name="com.google.android.gms.version"
+126-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\96004e15647bc525170b7742251f128d\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:22:13-58
+127            android:value="@integer/google_play_services_version" />
+127-->[com.google.android.gms:play-services-basement:18.3.0] C:\Users\Power Plus\.gradle\caches\transforms-3\96004e15647bc525170b7742251f128d\transformed\jetified-play-services-basement-18.3.0\AndroidManifest.xml:23:13-66
+128
+129        <uses-library
+129-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+130            android:name="androidx.window.extensions"
+130-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+131            android:required="false" />
+131-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+132        <uses-library
+132-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+133            android:name="androidx.window.sidecar"
+133-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+134            android:required="false" />
+134-->[androidx.window:window:1.2.0] C:\Users\Power Plus\.gradle\caches\transforms-3\3e108fe9d597d03770ae82acaebb5b63\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+135
+136        <provider
+136-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+137            android:name="androidx.startup.InitializationProvider"
+137-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
+138            android:authorities="com.example.hanger_m.androidx-startup"
+138-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
+139            android:exported="false" >
+139-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37
+140            <meta-data
+140-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+141                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+141-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+142                android:value="androidx.startup" />
+142-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Power Plus\.gradle\caches\transforms-3\5d9083683aa46ad6646ca7a884bd56df\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+143            <meta-data
+143-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+144                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+144-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+145                android:value="androidx.startup" />
+145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+146        </provider>
+147
+148        <receiver
+148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+149            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+149-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+150            android:directBootAware="false"
+150-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+151            android:enabled="true"
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+152            android:exported="true"
+152-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+153            android:permission="android.permission.DUMP" >
+153-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+154            <intent-filter>
+154-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+155                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+155-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+155-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+156            </intent-filter>
+157            <intent-filter>
+157-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+158                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+158-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+158-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+159            </intent-filter>
+160            <intent-filter>
+160-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+161                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+161-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+161-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+162            </intent-filter>
+163            <intent-filter>
+163-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+164                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+164-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+164-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Power Plus\.gradle\caches\transforms-3\1e1e8719823df11c58e964840aa823f6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+165            </intent-filter>
+166        </receiver>
+167    </application>
+168
+169</manifest>

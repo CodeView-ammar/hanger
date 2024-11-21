@@ -1,0 +1,1 @@
+ E:\\hinger\\hanger_m\\.dart_tool\\flutter_build\\211d71ee770c9e2708346fe66795d8c6\\native_assets.yaml: 
