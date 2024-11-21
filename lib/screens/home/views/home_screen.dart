@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shop/constants.dart';
 
 import 'components/best_sellers.dart';
-import 'components/flash_sale.dart';
 import 'components/most_popular.dart';
 import 'components/offer_carousel_and_categories.dart';
 import 'components/popular_products.dart';
