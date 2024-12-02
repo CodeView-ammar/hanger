@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
+import 'package:shop/components/api_extintion/url_api.dart';
 
 class AuthService {
-  final String apiUrl_verifyOTP = 'https://api.authentica.sa/api/sdk/v1/verifyOTP'; // تأكد من أن هذا هو URL الصحيح للتحقق
-  final String apiUrl_sendOTP = 'https://api.authentica.sa/api/sdk/v1/sendOTP';
+  final String apiUrl_verifyOTP = APIConfig.otpapiverifyEndpoint; // تأكد من أن هذا هو URL الصحيح للتحقق
+  final String apiUrl_sendOTP = APIConfig.otpapisendOTPEndpoint;
   final String apiSecret = '\$2y\$10\$jUwPsrvdplRWoTD5nGoaCOjD3j.3bNEhC3iIAma1TV9xDseuCYhZG';
 
   Future<bool> sendOTP(String phone) async {

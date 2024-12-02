@@ -64,7 +64,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       throw Exception("User ID is not found.");
     }
 
-    final response = await http.get(Uri.parse('${APIConfig.markEndpoint}$userId/'));
+    final response = await http.get(Uri.parse('${APIConfig.markEndpoint_get}$userId/'));
 
     if (response.statusCode == 200) {
       // Decode the JSON response
@@ -114,10 +114,11 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     try {
       // إرسال الطلب لحذف العنصر من الـ API
       print(id);
-      final response = await http.delete(Uri.parse('${APIConfig.markEndpoint}$userId/$id'));
-
+      print(userId);
+      final response = await http.delete(Uri.parse('${APIConfig.markEndpoint_delete}$userId/$id/'));
+      print(response.statusCode);
       // التحقق من حالة الاستجابة
-      if (response.statusCode == 200) {
+      if (response.statusCode == 204) {
         // إذا تم الحذف بنجاح، أعد تحميل المنتجات
         setState(() {
           _futureLaundries = fetchProducts(); // إعادة تحميل البيانات من جديد

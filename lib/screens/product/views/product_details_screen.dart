@@ -2,17 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/components/cart_button.dart';
 import 'package:shop/components/custom_modal_bottom_sheet.dart';
 import 'package:shop/components/product/services_card.dart';
 import 'package:shop/constants.dart';
-import 'package:shop/screens/home/views/components/categories.dart';
-import 'package:shop/screens/home/views/components/services_and_categories.dart';
+import 'package:shop/screens/product/views/components/product_images.dart';
 import 'package:shop/screens/product/views/components/service_info.dart';
-import 'components/notify_me_card.dart';
-import 'components/product_images.dart';
-import 'product_buy_now_screen.dart';
+import 'package:shop/screens/product/views/product_buy_now_screen.dart';
 
 // نموذج البيانات للخدمة
 class ServiceModel {
@@ -35,22 +33,13 @@ class ServiceModel {
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
       id: json['id'],
-      name: json['name'],
+      name: utf8.decode(json['name'].codeUnits),
       description: json['description'],
       price: double.parse(json['price']),
       urgentPrice: double.parse(json['urgent_price']),
       image: json['image'],
     );
   }
-}
-
-// نموذج البيانات للفئة
-class CategoryModel {
-  final String name;
-  final String? svgSrc;
-  final String? route;
-
-  CategoryModel({required this.name, this.svgSrc, this.route});
 }
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -79,10 +68,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _services = fetchServices(widget.id); // تهيئة المتغير هنا
+    _services = fetchServices(widget.id);
   }
 
-  // دالة لجلب بيانات الخدمات عبر API
   Future<List<ServiceModel>> fetchServices(id) async {
     final response = await http.get(Uri.parse('${APIConfig.servicesEndpoint}?laundry_id=${id}'));
 
@@ -94,24 +82,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  void showCustomBottomSheet(BuildContext context, ServiceModel service, int quantity) {
+    customModalBottomSheet(
+      context,
+      height: MediaQuery.of(context).size.height * 0.92,
+      child: ProductBuyNowScreen(
+        serviceName: service.name,
+        servicePrice: service.price * quantity, // حساب السعر بناءً على الكمية
+        serviceImage: service.image,
+        quantity: quantity,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: widget.isAvailable
           ? CartButton(
-              price: 140,
+              price: 0,
               press: () {
-                customModalBottomSheet(
-                  context,
-                  height: MediaQuery.of(context).size.height * 0.92,
-                  child: const ProductBuyNowScreen(),
-                );
+                showCustomBottomSheet(context, ServiceModel(
+                  id: widget.id,
+                  name: widget.name,
+                  description: "No description",
+                  price: 0,
+                  urgentPrice: 0,
+                  image: widget.image,
+                ), 1); // هنا يمكن استبدال 1 بالكمية التي يختارها المستخدم
               },
             )
-          : NotifyMeCard(
-              isNotify: false,
-              onChanged: (value) {},
-            ),
+          : SizedBox(),
       body: SafeArea(
         child: FutureBuilder<List<ServiceModel>>(
           future: _services,
@@ -122,7 +123,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               return Center(child: Text('خطأ: ${snapshot.error}'));
             } else if (snapshot.hasData) {
               final services = snapshot.data!;
-
               return CustomScrollView(
                 slivers: [
                   SliverAppBar(
@@ -138,21 +138,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                     ],
                   ),
-                  // عرض صور المنتج
                   ProductImages(images: [widget.image]),
-
-                  // عرض تفاصيل الخدمة
                   ServiceInfo(
                     brand: widget.address,
                     title: widget.name,
                     isAvailable: widget.isAvailable,
-                    description: "لا يوجد وصف", // يمكنك تعديل الوصف حسب الحاجة
+                    description: "لا يوجد وصف",
                     rating: 4.3,
                     numOfReviews: 126,
                   ),
-                  SliverToBoxAdapter(child: ServicesAndCategories()),
-
-                  // خدماتنا
                   SliverPadding(
                     padding: const EdgeInsets.all(defaultPadding),
                     sliver: SliverToBoxAdapter(
@@ -162,29 +156,32 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                     ),
                   ),
-                  SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.7,
-                      crossAxisSpacing: defaultPadding,
-                      mainAxisSpacing: defaultPadding,
-                    ),
+                  SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final service = services[index];
-                        return ServicesCard(
-                          image: service.image,
-                          title: utf8.decode(service.name.codeUnits), // استخدام utf8.decode
-                          brandName: widget.name,
-                          price: service.price,
-                          press: () {},
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          child: ListTile(
+                            leading: Image.network(
+                              service.image,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                            ),
+                            title: Text(service.name),
+                            subtitle: Text('السعر: \س.ر ${service.price.toStringAsFixed(2)}'),
+                            trailing: IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () {
+                                showCustomBottomSheet(context, service, 1); // يمكنك هنا تعديل الكمية
+                              },
+                            ),
+                          ),
                         );
                       },
                       childCount: services.length,
                     ),
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: defaultPadding),
                   ),
                 ],
               );

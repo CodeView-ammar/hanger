@@ -22,7 +22,7 @@ class AddedToCartMessageScreen extends StatelessWidget {
               ),
               const Spacer(flex: 2),
               Text(
-                "Added to cart",
+                "اضافة للسلة",
                 style: Theme.of(context)
                     .textTheme
                     .headlineSmall!
@@ -30,20 +30,24 @@ class AddedToCartMessageScreen extends StatelessWidget {
               ),
               const SizedBox(height: defaultPadding / 2),
               const Text(
-                "Click the checkout button to complete the purchase process.",
+                "انقر على زر الخروج لإكمال عملية الشراء.",
                 textAlign: TextAlign.center,
               ),
               const Spacer(flex: 2),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, entryPointScreenRoute);
+                  // إغلاق شاشة AddedToCartMessageScreen و BottomSheet
+                  Navigator.pop(context); // إغلاق الشاشة الحالية (AddedToCartMessageScreen)
+                  Navigator.pop(context); // إغلاق الـ BottomSheet المفتوح
                 },
-                child: const Text("Continue shopping"),
+                child: const Text("مواصلة"),
               ),
               const SizedBox(height: defaultPadding),
               ElevatedButton(
-                onPressed: () {},
-                child: const Text("Checkout"),
+                onPressed: () {
+                  // هنا يمكن إضافة وظائف خاصة بإتمام الدفع، مثل الانتقال إلى شاشة الدفع
+                },
+                child: const Text("الدفع"),
               ),
               const Spacer(),
             ],

@@ -38,6 +38,7 @@ com.example.hanger_m.app-packaged_res-36 E:\hinger\hanger_m\build\google_maps_fl
 com.example.hanger_m.app-packaged_res-37 E:\hinger\hanger_m\build\image_picker_android\intermediates\packaged_res\debug
 com.example.hanger_m.app-packaged_res-38 E:\hinger\hanger_m\build\location\intermediates\packaged_res\debug
 com.example.hanger_m.app-packaged_res-39 E:\hinger\hanger_m\build\path_provider_android\intermediates\packaged_res\debug
-com.example.hanger_m.app-packaged_res-40 E:\hinger\hanger_m\build\shared_preferences_android\intermediates\packaged_res\debug
-com.example.hanger_m.app-packaged_res-41 E:\hinger\hanger_m\build\sqflite_android\intermediates\packaged_res\debug
-com.example.hanger_m.app-packaged_res-42 E:\hinger\hanger_m\build\url_launcher_android\intermediates\packaged_res\debug
+com.example.hanger_m.app-packaged_res-40 E:\hinger\hanger_m\build\permission_handler_android\intermediates\packaged_res\debug
+com.example.hanger_m.app-packaged_res-41 E:\hinger\hanger_m\build\shared_preferences_android\intermediates\packaged_res\debug
+com.example.hanger_m.app-packaged_res-42 E:\hinger\hanger_m\build\sqflite_android\intermediates\packaged_res\debug
+com.example.hanger_m.app-packaged_res-43 E:\hinger\hanger_m\build\url_launcher_android\intermediates\packaged_res\debug

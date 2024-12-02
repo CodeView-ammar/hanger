@@ -1,4 +1,4 @@
-#Fri Nov 22 02:15:03 AST 2024
+#Mon Dec 02 22:38:13 AST 2024
 base.0=E\:\\hinger\\hanger_m\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=E\:\\hinger\\hanger_m\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
 base.2=E\:\\hinger\\hanger_m\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex

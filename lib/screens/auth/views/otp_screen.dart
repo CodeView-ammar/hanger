@@ -1,11 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shop/components/api_extintion/otp_api.dart';
+import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/constants.dart';
 import 'package:shop/route/route_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
+
 class VerifyOTPScreen extends StatefulWidget {
   final String phone; // استلام رقم الهاتف من شاشة تسجيل الدخول
 
@@ -30,7 +32,7 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
   // دالة لإعادة إرسال OTP
   Future<void> _resendOTP() async {
     var authService = AuthService();
-    bool success = await authService.sendOTP(widget.phone); // تأكد من أن sendOTP تعمل بشكل صحيح
+    bool success = await authService.sendOTP(widget.phone);
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("تم إعادة إرسال OTP")),
@@ -40,29 +42,40 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
     }
   }
 
-
 Future<String?> saveDataToApi(Map<String, dynamic> data) async {
   try {
-    // إرسال البيانات عبر HTTP POST
-    final response = await http.post(
-      Uri.parse('https://hanger.metasoft-ar.com/api/users/'),
+    // تحقق مما إذا كان رقم الجوال موجودًا مسبقًا
+    final phone = data['phone']; // افترض أن رقم الجوال موجود في الـ data
+    final checkResponse = await http.get(
+      Uri.parse('${APIConfig.otpphoneEndpoint}$phone'),
       headers: {
-        'Content-Type': 'application/json', // تأكد من تعيين الهيدر بشكل صحيح
+        'Content-Type': 'application/json',
       },
-      body: json.encode(data), // تحويل البيانات إلى JSON
+    );
+
+    if (checkResponse.statusCode == 200) {
+      final checkData = json.decode(checkResponse.body);
+      if (checkData.isNotEmpty) {
+        // إذا كان رقم الجوال موجودًا، إرجاع الـ id
+        return checkData[0]['id'].toString();
+      }
+    }
+
+    // إرسال البيانات عبر HTTP POST إذا لم يكن رقم الجوال موجودًا
+    final response = await http.post(
+      Uri.parse(APIConfig.useraddEndpoint),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(data),
     );
 
     // التحقق من حالة الاستجابة
-    if (response.statusCode == 201) { // تأكد من استخدام 201 لنجاح الإنشاء
-      // إذا كانت الاستجابة ناجحة، قم بتحليل البيانات
+    if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
       print("Data submitted successfully.");
-      // إرجاع الـ id الخاص بالمستخدم
-      print(responseData['id'].toString());
-      // إرجاع الـ id الخاص بالمستخدم
-      return responseData['id'].toString(); // تأكد من أن الـ API يعيد الـ id بهذا الاسم
+      return responseData['id'].toString();
     } else {
-      // إذا كانت الاستجابة غير ناجحة، قم بمعالجة الأخطاء
       try {
         final responseData = json.decode(response.body);
         print("API error: ${responseData['detail'] ?? 'Unknown error'}");
@@ -77,17 +90,43 @@ Future<String?> saveDataToApi(Map<String, dynamic> data) async {
     return "";
   }
 }
+  Future<Position> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Permissions are denied');
+      }
+    }
+
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+Future<bool> location() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+   try {
+      Position position = await _getCurrentLocation();
+      await prefs.setDouble('latitude', position.latitude);
+      await prefs.setDouble('longitude', position.longitude);
+      print( position.latitude);
+      print( position.longitude);
+    } catch (e) {
+      print('Error getting location: $e');
+    return false;
+    }
+  return true;
+}
+  Future<bool> logIn(String phone, String id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userPhone', phone);
+    await prefs.setString('userid', id);
+                          location();
+    // جلب الموقع وحفظه
+   
+    return true; // افترض أن تسجيل الدخول ناجح
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-        Future<bool> logIn(String phone,String id) async {
-          // هنا يمكنك إضافة منطق تسجيل الدخول الخاص بك
-          // إذا كان تسجيل الدخول ناجحًا، احفظ الجلسة:
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('userPhone', phone); // حفظ رقم الهاتف
-          await prefs.setString('userid', id); // حفظ رقم الهاتف
-          return true; // افترض أن تسجيل الدخول ناجح
-        }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -132,32 +171,22 @@ Future<String?> saveDataToApi(Map<String, dynamic> data) async {
                         // التحقق من الرمز
                         bool success = await authService.verifyOTP(widget.phone, otpCode);
                         if (success) {
-                          
-
-                            if (success) {
-                           Map<String, dynamic> userData ={
+                          Map<String, dynamic> userData = {
                             "username": widget.phone,
                             "phone": widget.phone,
                             "role": "customer",
                             "password": widget.phone
                           };
-                           String? id = await saveDataToApi(userData);
+                          String? id = await saveDataToApi(userData);
 
-                            // تحقق مما إذا كان الـ id تم استرجاعه بنجاح
-                            if (id != null) {
-                              // استدعاء دالة تسجيل الدخول مع رقم الهاتف والـ id
-                              logIn(widget.phone, id);
-                            } else {
-                              // معالجة الحالة عندما يفشل الحفظ
-                              print("فشل في حفظ البيانات أو استرجاع الـ id.");
-                            }
-                              // معالجة النجاح
-                              print("User created successfully");
-                            } else {
-                              // معالجة الفشل
-                              print("Failed to create user");
-                            }
-
+                          // تحقق مما إذا كان الـ id تم استرجاعه بنجاح
+                          if (id != null) {
+                            // استدعاء دالة تسجيل الدخول مع رقم الهاتف والـ id
+                            await logIn(widget.phone, id); // أضف await هنا
+                          } else {
+                            print("فشل في حفظ البيانات أو استرجاع الـ id.");
+                          }
+                          location();
                           Navigator.pushNamedAndRemoveUntil(
                             context,
                             entryPointScreenRoute, // الشاشة التي تلي التحقق
@@ -207,22 +236,6 @@ Future<String?> saveDataToApi(Map<String, dynamic> data) async {
             FocusScope.of(context).previousFocus();
           }
         },
-        onTap: () {
-          // عند النقر على الحقل، إذا كان هناك قيمة سابقة، نعيد توزيعها
-          if (controller.text.isEmpty) {
-            String fullOTP = _retrieveFullOTP();
-            if (fullOTP.isNotEmpty) {
-              _distributeOTP(fullOTP);
-            }
-          }
-        },
-        onEditingComplete: () {
-          // استدعاء الدالة لتوزيع الرقم عند الانتهاء من التحرير
-          String text = controller.text;
-          if (text.length > 1) {
-            _distributeOTP(text);
-          }
-        },
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'الرجاء إدخال الرمز';
@@ -231,26 +244,6 @@ Future<String?> saveDataToApi(Map<String, dynamic> data) async {
         },
       ),
     );
-  }
-
-  // دالة لتوزيع الرقم على الحقول الأربعة
-  void _distributeOTP(String otp) {
-    if (otp.length > 4) {
-      otp = otp.substring(0, 4); // أخذ أول 4 أرقام فقط
-    }
-    List<String> otpList = otp.split('');
-    _otpController1.text = otpList.length > 0 ? otpList[0] : '';
-    _otpController2.text = otpList.length > 1 ? otpList[1] : '';
-    _otpController3.text = otpList.length > 2 ? otpList[2] : '';
-    _otpController4.text = otpList.length > 3 ? otpList[3] : '';
-    
-    // الانتقال إلى الحقل الأخير بعد التوزيع
-    FocusScope.of(context).unfocus(); // أغلق لوحة المفاتيح
-  }
-
-  // دالة لاسترجاع الرقم الكامل في حال اللصق
-  String _retrieveFullOTP() {
-    return _otpController1.text + _otpController2.text + _otpController3.text + _otpController4.text;
   }
 
   // دالة لعرض رسالة الخطأ

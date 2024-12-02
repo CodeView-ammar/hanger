@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '/components/network_image_with_loader.dart';
-
 import '../../../../constants.dart';
 
 class ProductImages extends StatefulWidget {
@@ -22,8 +21,7 @@ class _ProductImagesState extends State<ProductImages> {
 
   @override
   void initState() {
-    _controller =
-        PageController(viewportFraction: 0.9, initialPage: _currentPage);
+    _controller = PageController(viewportFraction: 0.8, initialPage: _currentPage); // تقليل viewportFraction
     super.initState();
   }
 
@@ -36,8 +34,8 @@ class _ProductImagesState extends State<ProductImages> {
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      child: AspectRatio(
-        aspectRatio: 1,
+      child: SizedBox(
+        height: 200, // تعيين ارتفاع محدد للصور
         child: Stack(
           children: [
             PageView.builder(
@@ -91,7 +89,7 @@ class _ProductImagesState extends State<ProductImages> {
                     ),
                   ),
                 ),
-              )
+              ),
           ],
         ),
       ),
