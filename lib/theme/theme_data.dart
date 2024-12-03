@@ -44,7 +44,7 @@ DataTableThemeData dataTableLightThemeData = DataTableThemeData(
 
 DataTableThemeData dataTableDarkThemeData = DataTableThemeData(
   columnSpacing: 24,
-  headingRowColor: MaterialStateProperty.all(Colors.white10),
+  headingRowColor: WidgetStateProperty.all(Colors.white10),
   decoration: BoxDecoration(
     borderRadius: const BorderRadius.all(Radius.circular(defaultBorderRadious)),
     border: Border.all(color: Colors.white10),

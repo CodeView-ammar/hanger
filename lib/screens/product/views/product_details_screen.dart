@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/components/cart_button.dart';
 import 'package:shop/components/custom_modal_bottom_sheet.dart';
-import 'package:shop/components/product/services_card.dart';
 import 'package:shop/constants.dart';
+import 'package:shop/screens/checkout/views/cart_screen.dart';
 import 'package:shop/screens/product/views/components/product_images.dart';
 import 'package:shop/screens/product/views/components/service_info.dart';
 import 'package:shop/screens/product/views/product_buy_now_screen.dart';
@@ -64,11 +64,35 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late Future<List<ServiceModel>> _services;
+  double totalPrice = 0.0;  // إضافة متغير لتخزين total_price
 
   @override
   void initState() {
     super.initState();
     _services = fetchServices(widget.id);
+    fetchTotalPrice(widget.id);  // جلب total_price من الـ API عند تحميل الصفحة
+  }
+
+  // دالة لجلب الـ total_price من الـ API
+  Future<void> fetchTotalPrice(serverid) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');  // جلب ID المستخدم من SharedPreferences
+    final response = await http.get(Uri.parse('${APIConfig.cartfilterEndpoint}?user=$userId&laundry=$serverid'));
+
+    if (response.statusCode == 200) {
+      
+      final data = jsonDecode(response.body);
+      setState(() {
+        if (data['total_price'] == 0) {
+          totalPrice = 0.0; // إذا كانت total_price تساوي 0، قم بتعيين totalPrice إلى 0.0
+        } else {
+          totalPrice = data['total_price']; // تحديث الـ total_price
+        }
+      });
+
+    } else {
+      throw Exception('فشل في جلب total_price');
+    }
   }
 
   Future<List<ServiceModel>> fetchServices(id) async {
@@ -82,37 +106,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
-  void showCustomBottomSheet(BuildContext context, ServiceModel service, int quantity) {
-    customModalBottomSheet(
-      context,
-      height: MediaQuery.of(context).size.height * 0.92,
-      child: ProductBuyNowScreen(
-        serviceName: service.name,
-        servicePrice: service.price * quantity, // حساب السعر بناءً على الكمية
-        serviceImage: service.image,
-        quantity: quantity,
-      ),
-    );
-  }
+ void showCustomBottomSheet(BuildContext context, ServiceModel service, int quantity) async {
+  await customModalBottomSheet(
+    context,
+    height: MediaQuery.of(context).size.height * 0.92,
+    child: ProductBuyNowScreen(
+      serviceId: service.id,
+      serviceName: service.name,
+      servicePrice: service.price * quantity,
+      serviceImage: service.image,
+      quantity: quantity,
+      laundry: widget.id,
+    ),
+  );
 
+  // تحديث totalPrice بعد إغلاق الشاشة
+  await fetchTotalPrice(widget.id); 
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: widget.isAvailable
-          ? CartButton(
-              price: 0,
+      bottomNavigationBar:CartButton(
+              price: totalPrice,
               press: () {
-                showCustomBottomSheet(context, ServiceModel(
-                  id: widget.id,
-                  name: widget.name,
-                  description: "No description",
-                  price: 0,
-                  urgentPrice: 0,
-                  image: widget.image,
-                ), 1); // هنا يمكن استبدال 1 بالكمية التي يختارها المستخدم
+                Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CartScreen(),
+                settings: RouteSettings(
+                  arguments: widget.id,  // تمرير الـ id هنا
+                ),
+              ),
+            );
               },
-            )
-          : SizedBox(),
+            ),
       body: SafeArea(
         child: FutureBuilder<List<ServiceModel>>(
           future: _services,

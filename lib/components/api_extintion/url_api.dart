@@ -10,6 +10,10 @@ class APIConfig {
   static String get otpphoneEndpoint => '$_baseUrl/user_phone/';
   static String get useraddEndpoint => '$_baseUrl/users/';
   static String get markerEndpoint => '$_baseUrl/user_laundry_marks/';
+  static String get CartsEndpoint => '$_baseUrl/carts/';
+  static String get addressesEndpoint => '$_baseUrl/addresses/';
+  static String get cartfilterEndpoint => '$_baseUrl/cart/filter/';
+
 
 
   static String get otpapiverifyEndpoint => "https://api.authentica.sa/api/sdk/v1/verifyOTP";

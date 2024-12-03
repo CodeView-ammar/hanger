@@ -5,8 +5,8 @@ import '../constants.dart';
 
 class RiderInfo extends StatelessWidget {
   const RiderInfo({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +35,7 @@ class RiderInfo extends StatelessWidget {
             onPressed: () {},
             child: SvgPicture.asset(
               "assets/icons/Chat.svg",
+              // ignore: deprecated_member_use
               color: Colors.white,
             ),
           ),

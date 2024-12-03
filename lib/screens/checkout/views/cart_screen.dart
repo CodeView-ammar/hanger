@@ -1,35 +1,93 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop/components/api_extintion/url_api.dart';
+import 'package:http/http.dart' as http;
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // مثال على قائمة بالمنتجات في السلة
-    final List<Map<String, dynamic>> cartItems = [
-      {
-        'name': 'منتج 1',
-        'price': 50.0,
-        'quantity': 1,
-      },
-      {
-        'name': 'منتج 2',
-        'price': 30.0,
-        'quantity': 2,
-      },
-      {
-        'name': 'منتج 3',
-        'price': 20.0,
-        'quantity': 1,
-      },
-    ];
+  _CartScreenState createState() => _CartScreenState();
+}
 
-    // حساب السعر الإجمالي
-    double totalPrice = 0;
-    for (var item in cartItems) {
-      totalPrice += item['price'] * item['quantity'];
+class _CartScreenState extends State<CartScreen> {
+  double totalPrice = 0.0;
+  List<Map<String, dynamic>> cartItems = [];
+
+  Future<void> fetchCartData(int laundryId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');
+
+    if (userId != null) {
+      final response = await http.get(
+        Uri.parse('${APIConfig.cartfilterEndpoint}?user=$userId&laundry=$laundryId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        setState(() {
+          if (data['carts'] != null && data['carts'].isNotEmpty) {
+            cartItems = List<Map<String, dynamic>>.from(data['carts']);
+            totalPrice = data['carts']
+                .fold(0.0, (sum, item) => sum + double.parse(item['price']) * item['quantity']);
+          } else {
+            cartItems = [];
+            totalPrice = 0.0;
+          }
+        });
+      } else {
+        throw Exception('فشل في جلب البيانات من الـ API');
+      }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('خطأ'),
+            content: const Text('لم يتم العثور على معرف المستخدم. يرجى تسجيل الدخول أولاً.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('موافق'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
+  }
 
+  void updateQuantity(int index, int delta) {
+    setState(() {
+      cartItems[index]['quantity'] = (cartItems[index]['quantity'] + delta).clamp(1, 99);
+      totalPrice = cartItems.fold(0.0, (sum, item) => sum + double.parse(item['price']) * item['quantity']);
+    });
+  }
+
+  void removeItem(int index) {
+    setState(() {
+      cartItems.removeAt(index);
+      totalPrice = cartItems.fold(0.0, (sum, item) => sum + double.parse(item['price']) * item['quantity']);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final int laundryId = args != null ? args as int : 0;
+
+    if (laundryId > 0) {
+      fetchCartData(laundryId);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("سلة التسوق"),
@@ -40,24 +98,44 @@ class CartScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ListView.builder(
-                itemCount: cartItems.length,
-                itemBuilder: (context, index) {
-                  final item = cartItems[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      title: Text(item['name']),
-                      subtitle: Text("سعر: \$${item['price']} × ${item['quantity']}"),
-                      trailing: Text("إجمالي: \$${item['price'] * item['quantity']}"),
+              child: cartItems.isEmpty
+                  ? const Center(child: Text('لا توجد عناصر في السلة'))
+                  : ListView.builder(
+                      itemCount: cartItems.length,
+                      itemBuilder: (context, index) {
+                        final item = cartItems[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ListTile(
+                            title: Text(utf8.decode(item['service_name'].codeUnits)),
+                            subtitle: Text("سعر: \س.ر ${item['price']} × ${item['quantity']}"),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove),
+                                  onPressed: () => updateQuantity(index, -1),
+                                ),
+                                Text('${item['quantity']}'),
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: () => updateQuantity(index, 1),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  color: Colors.red,
+                                  onPressed: () => removeItem(index),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
             const SizedBox(height: 16.0),
             Text(
-              "الإجمالي: \$${totalPrice.toStringAsFixed(2)}",
+              "الإجمالي: \س.ر ${totalPrice.toStringAsFixed(2)}",
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16.0),

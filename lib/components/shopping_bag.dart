@@ -39,7 +39,7 @@ class ShoppingBag extends StatelessWidget {
                   fontFamily: grandisExtendedFont,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: Theme.of(context).brightness == Brightness.light
                       ? blackColor
                       : Colors.white,
                 ),

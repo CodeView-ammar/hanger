@@ -13,8 +13,7 @@ class LocationService {
   // دالة لحساب المسافة بين نقطتين
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const earthRadius = 6371; // نصف قطر الأرض بالكيلومترات
-  print(lat1);
-  print(lon1);
+ 
     // تحويل الدرجات إلى راديان
     double dLat = _toRadians(lat2 - lat1);
     double dLon = _toRadians(lon2 - lon1);

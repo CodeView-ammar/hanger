@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +14,9 @@ class ProductModel {
   final String name;
   final String? address;
   final String? image;
+  // ignore: non_constant_identifier_names
   final double? x_latitude; 
+  // ignore: non_constant_identifier_names
   final double? y_longitude;
 
   ProductModel({
@@ -23,7 +24,9 @@ class ProductModel {
     required this.name,
     this.address,
     this.image,
+    // ignore: non_constant_identifier_names
     this.x_latitude,
+    // ignore: non_constant_identifier_names
     this.y_longitude,
   });
 
@@ -78,7 +81,7 @@ class _BestSellersState extends State<BestSellers> {
   List<ProductModel> _displayedProducts = [];
   bool _isLoading = false;
   int _currentPage = 1;
-  LocationService _locationService = LocationService();
+  final LocationService _locationService = LocationService();
   double? _userLatitude;
   double? _userLongitude;
 
@@ -139,6 +142,7 @@ class _BestSellersState extends State<BestSellers> {
         });
       });
     } catch (e) {
+      // ignore: avoid_print
       print("Error refreshing products: $e");
     } finally {
       setState(() {
@@ -182,6 +186,7 @@ class _BestSellersState extends State<BestSellers> {
         });
       });
     } catch (e) {
+      // ignore: avoid_print
       print("Error loading more products: $e");
     } finally {
       setState(() {
@@ -327,7 +332,7 @@ class _BestSellersState extends State<BestSellers> {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              _getDistanceToLaundry(products[index]).toStringAsFixed(2) + ' km',
+                              '${_getDistanceToLaundry(products[index]).toStringAsFixed(2)} km',
                               style: const TextStyle(fontSize: 14, color: Colors.white),
                             ),
                           ],

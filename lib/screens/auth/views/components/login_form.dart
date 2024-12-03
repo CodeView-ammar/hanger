@@ -40,7 +40,7 @@ class LogInForm extends StatelessWidget {
                   onChanged: (String? newValue) {
                     // يمكنك إضافة منطق لتخزين مفتاح الدولة المحدد
                   },
-                  underline: SizedBox(), // لإخفاء الخط السفلي
+                  underline: const SizedBox(), // لإخفاء الخط السفلي
                 ),
               ),
               Expanded(
@@ -48,7 +48,7 @@ class LogInForm extends StatelessWidget {
                   onSaved: (phone) {
                     if (phone != null) {
                       // دمج مفتاح الدولة مع الرقم المدخل
-                      onPhoneSaved("+966" + phone); // حفظ الرقم كاملاً
+                      onPhoneSaved("+966$phone"); // حفظ الرقم كاملاً
                     }
                   },
                   validator: (value) {
@@ -63,7 +63,7 @@ class LogInForm extends StatelessWidget {
                   
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "رقم الجوال",
                   ),
                 ),

@@ -1,7 +1,12 @@
+import 'dart:convert';  // لإجراء عمليات تحويل JSON
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;  // لإرسال الطلبات HTTP
+import 'package:shared_preferences/shared_preferences.dart';  // لاستخدام SharedPreferences
+import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/components/cart_button.dart';
 import 'package:shop/components/custom_modal_bottom_sheet.dart';
 import 'package:shop/screens/product/views/added_to_cart_message_screen.dart';
+
 import '../../../constants.dart';
 import 'components/product_quantity.dart';
 import 'components/unit_price.dart';
@@ -11,6 +16,8 @@ class ProductBuyNowScreen extends StatefulWidget {
   final double servicePrice;
   final String serviceImage;
   final int quantity;
+  final int laundry;
+  final int serviceId;
 
   const ProductBuyNowScreen({
     super.key,
@@ -18,6 +25,8 @@ class ProductBuyNowScreen extends StatefulWidget {
     required this.servicePrice,
     required this.serviceImage,
     required this.quantity,
+    required this.laundry,
+    required this.serviceId,
   });
 
   @override
@@ -27,36 +36,50 @@ class ProductBuyNowScreen extends StatefulWidget {
 class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
   int _quantity = 1;
 
-  void addToCart() {
-    // إضافة الخدمة إلى السلة
-    // يمكنك تعديل هذا الجزء ليقوم بإضافة الخدمة إلى سلة التسوق
-    // مثلاً يمكنك استخدام SharedPreferences أو أي طريقة تخزين أخرى
+  Future<void> _addToCart() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');  // جلب ID المستخدم من SharedPreferences
 
-    // مثال على كيفية إضافة الخدمة إلى السلة
-    final cartItem = {
-      'serviceName': widget.serviceName,
-      'servicePrice': widget.servicePrice,
-      'quantity': _quantity,
-      'serviceImage': widget.serviceImage,
-    };
+    if (userId == null) {
+      // إذا لم يكن ID المستخدم موجودًا، يمكنك عرض رسالة خطأ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('لا يوجد مستخدم مسجل.'),
+        ),
+      );
+      return;
+    }
 
-    // هنا يمكنك تخزين cartItem في قائمة السلة الخاصة بك
-    // هذا مجرد مثال، فعليك تعديل هذا الجزء حسب منطق التطبيق الخاص بك
-
-    // عرض رسالة تأكيد
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${widget.serviceName} تمت إضافته إلى السلة!'),
-        duration: const Duration(seconds: 2),
-      ),
+    final url = APIConfig.CartsEndpoint;  // استبدل بـ URL الخاص بك
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'price': widget.servicePrice,
+        'quantity': _quantity,
+        'user': userId,  // استخدام ID المستخدم من SharedPreferences
+        'laundry': widget.laundry,
+        'service': widget.serviceId,  
+      }),
     );
-
-    // إظهار شاشة الرسالة
-    customModalBottomSheet(
-      context,
-      isDismissible: false,
-      child: const AddedToCartMessageScreen(),
-    );
+    print(response.statusCode);
+    if (response.statusCode == 201 ||response.statusCode == 200) {
+      // إذا تم إضافة المنتج بنجاح
+      customModalBottomSheet(
+        context,
+        isDismissible: false,
+        child: const AddedToCartMessageScreen(),
+      );
+    } else {
+      // معالجة الخطأ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('فشل في إضافة المنتج إلى السلة!'),
+        ),
+      );
+    }
   }
 
   @override
@@ -66,9 +89,11 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
     return Scaffold(
       bottomNavigationBar: CartButton(
         price: totalPrice,
-        title: "إضافة للسلة",
+        title: "اضافة للسلة",
         subTitle: "الإجمالي",
-        press: addToCart, // استدعاء دالة addToCart عند الضغط
+        press: () {
+          _addToCart();  // استدعاء دالة إضافة المنتج إلى السلة
+        },
       ),
       body: Column(
         children: [
@@ -80,7 +105,7 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
               children: [
                 const BackButton(),
                 Text(
-                  widget.serviceName,  // عرض اسم الخدمة المرسل
+                  widget.serviceName,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
@@ -97,7 +122,7 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
                       children: [
                         Expanded(
                           child: UnitPrice(
-                            price: widget.servicePrice,  // تمرير السعر الأصلي
+                            price: widget.servicePrice,
                           ),
                         ),
                         ProductQuantity(

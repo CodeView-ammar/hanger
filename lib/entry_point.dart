@@ -16,9 +16,7 @@ class _EntryPointState extends State<EntryPoint> {
     HomeScreen(),
     DiscoverScreen(),
     BookmarkScreen(),
-    // EmptyCartScreen(), // if Cart is empty
-    CartScreen(),
-    ProfileScreen(),
+    ProfileScreen(),  // تأكد من أن "ملفي" موجود هنا
   ];
   int _currentIndex = 0;
 
@@ -30,16 +28,13 @@ class _EntryPointState extends State<EntryPoint> {
         height: 24,
         colorFilter: ColorFilter.mode(
             color ?? Theme.of(context).iconTheme.color!.withOpacity(
-                Theme.of(context).brightness == Brightness.dark ? 0.3 : 1),
+                Theme.of(context).brightness == Brightness.light ? 0.3 : 1),
             BlendMode.srcIn),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        // pinned: true,
-        // floating: true,
-        // snap: true,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: const SizedBox(),
         leadingWidth: 0,
@@ -54,9 +49,8 @@ class _EntryPointState extends State<EntryPoint> {
         actions: [
           IconButton(
             onPressed: () {
-              // عند النقر على زر البحث، انتقل إلى "الأقسام"
               setState(() {
-                _currentIndex = 1; // هذا هو فهرس "الأقسام" في BottomNavigationBar
+                _currentIndex = 1; // الانتقال إلى "الأقسام"
               });
             },
             icon: SvgPicture.asset(
@@ -70,7 +64,6 @@ class _EntryPointState extends State<EntryPoint> {
           IconButton(
             onPressed: () {
               Navigator.pushNamed(context, addressesScreenRoute);
-              
             },
             icon: SvgPicture.asset(
               "assets/icons/Location.svg",
@@ -80,10 +73,8 @@ class _EntryPointState extends State<EntryPoint> {
                   BlendMode.srcIn),
             ),
           ),
-        
           IconButton(
             onPressed: () {
-              
               Navigator.pushNamed(context, notificationsScreenRoute);
             },
             icon: SvgPicture.asset(
@@ -105,7 +96,7 @@ class _EntryPointState extends State<EntryPoint> {
             child: child,
           );
         },
-        child: _pages[_currentIndex],
+        child: _pages[_currentIndex],  // عرض الصفحة المناسبة بناءً على _currentIndex
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(top: defaultPadding / 2),
@@ -117,7 +108,7 @@ class _EntryPointState extends State<EntryPoint> {
           onTap: (index) {
             if (index != _currentIndex) {
               setState(() {
-                _currentIndex = index;
+                _currentIndex = index; // تحديث الـ _currentIndex عند النقر
               });
             }
           },
@@ -144,15 +135,11 @@ class _EntryPointState extends State<EntryPoint> {
               activeIcon: svgIcon("assets/icons/Bookmark.svg", color: primaryColor),
               label: "المحفوظات",
             ),
-            BottomNavigationBarItem(
-              icon: svgIcon("assets/icons/Bag.svg"),
-              activeIcon: svgIcon("assets/icons/Bag.svg", color: primaryColor),
-              label: "السلة",
-            ),
+            // تم إزالة السلة
             BottomNavigationBarItem(
               icon: svgIcon("assets/icons/Profile.svg"),
               activeIcon: svgIcon("assets/icons/Profile.svg", color: primaryColor),
-              label: "ملفي",
+              label: "ملفي", // سيتم فتح ProfileScreen عند النقر هنا
             ),
           ],
         ),

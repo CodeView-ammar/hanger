@@ -20,34 +20,34 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
   final List<Onbord> _onbordData = [
     Onbord(
       image: "assets/Illustration/Illustration-0.png",
-      imageDarkTheme: "assets/Illustration/Illustration_darkTheme_0.png",
+      imageDarkTheme: "assets/Illustration/Illustration-0.png",
       title: "ابحث عن المغاسل التي بالقرب منك",
       description:
           "هنا ستجد جميع المغاسل مع التصنيفات الخاصة بها ومعرفة المغسلة الاقرب منك",
     ),
     Onbord(
       image: "assets/Illustration/Illustration-1.png",
-      imageDarkTheme: "assets/Illustration/Illustration_darkTheme_1.png",
+      imageDarkTheme: "assets/Illustration/Illustration-1.png",
       title: "قم بإختيار المغسلة وإختيار انواع الثياب التي تريد ان تغسلها وضعها في السلة",
       description:
           "قم بإختيار المغسلة وإختيار انواع الثياب التي تريد ان تغسلها وضعها في السلة وسيتم الوصول إلا موقعك من قبل الدلفري الخاص بنا وتوصيلها للمغسلة المراد ",
     ),
     Onbord(
       image: "assets/Illustration/Illustration-2.png",
-      imageDarkTheme: "assets/Illustration/Illustration_darkTheme_2.png",
+      imageDarkTheme: "assets/Illustration/Illustration-2.png",
       title: "دفع \nسريع وآمن",
       description: "هناك العديد من خيارات الدفع المتاحة لراحتك.",
     ),
     Onbord(
       image: "assets/Illustration/Illustration-3.png",
-      imageDarkTheme: "assets/Illustration/Illustration_darkTheme_3.png",
+      imageDarkTheme: "assets/Illustration/Illustration-3.png",
       title: "تتبع الطلب",
       description:
           "على وجه الخصوص، يمكن لـ معلاق تعبئة طلباتك، ومساعدتك في إدارة شحناتك بسلاسة.",
     ),
     Onbord(
       image: "assets/Illustration/Illustration-4.png",
-      imageDarkTheme: "assets/Illustration/Illustration_darkTheme_4.png",
+      imageDarkTheme: "assets/Illustration/Illustration-4.png",
       title: "المغاسل القريبة",
       description:
           "يمكنك بسهولة تتبع مغاسل وتصفح العناصر الخاصة بهم والحصول على معلومات حول خدماتهم.",
@@ -120,7 +120,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
                   itemBuilder: (context, index) => OnbordingContent(
                     title: _onbordData[index].title,
                     description: _onbordData[index].description,
-                    image: (Theme.of(context).brightness == Brightness.dark &&
+                    image: (Theme.of(context).brightness == Brightness.light &&
                             _onbordData[index].imageDarkTheme != null)
                         ? _onbordData[index].imageDarkTheme!
                         : _onbordData[index].image,

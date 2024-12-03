@@ -1,26 +1,26 @@
 [
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\mipmap-xxxhdpi\\ic_launcher.png"
+        "merged": "com.example.hanger_m.app-merged_res-33:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.example.hanger_m.app-main-28:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\mipmap-hdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\mipmap-hdpi\\ic_launcher.png"
+        "merged": "com.example.hanger_m.app-merged_res-33:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.example.hanger_m.app-main-28:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\mipmap-mdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\mipmap-mdpi\\ic_launcher.png"
+        "merged": "com.example.hanger_m.app-merged_res-33:/drawable-v21_launch_background.xml.flat",
+        "source": "com.example.hanger_m.app-main-28:/drawable-v21/launch_background.xml"
     },
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\drawable-v21_launch_background.xml.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\drawable-v21\\launch_background.xml"
+        "merged": "com.example.hanger_m.app-merged_res-33:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.example.hanger_m.app-main-28:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\mipmap-xhdpi\\ic_launcher.png"
+        "merged": "com.example.hanger_m.app-merged_res-33:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.example.hanger_m.app-main-28:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-merged_res-33:\\mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "C:\\Users\\Power Plus\\.gradle\\daemon\\8.3\\com.example.hanger_m.app-main-28:\\mipmap-xxhdpi\\ic_launcher.png"
+        "merged": "com.example.hanger_m.app-merged_res-33:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.example.hanger_m.app-main-28:/mipmap-mdpi/ic_launcher.png"
     }
 ]
