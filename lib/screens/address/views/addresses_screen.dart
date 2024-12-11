@@ -20,20 +20,17 @@ class AddressesScreenState extends State<AddressesScreen> {
   location_.Location location = location_.Location();
   location_.LocationData? currentLocation;
   LatLng userLocationMarker = LatLng(0.0, 0.0);
-  String coordinatesText = "";
   String addressText = "";
   late BitmapDescriptor customMarker;
   late GoogleMapController mapController;
-  bool isManualLocationSet = false;
   TextEditingController addressController = TextEditingController();
-
-  late StreamSubscription<location_.LocationData> locationSubscription;
+  StreamSubscription<location_.LocationData>? locationSubscription;
 
   @override
   void initState() {
     super.initState();
-    getCurrentLocation();
     _loadCustomMarker();
+    fetchLocationFromApi(); // جلب الموقع من API عند بدء التطبيق
   }
 
   Future<void> _loadCustomMarker() async {
@@ -43,7 +40,27 @@ class AddressesScreenState extends State<AddressesScreen> {
     );
   }
 
-  Future<void> getCurrentLocation() async {
+  Future<void> fetchLocationFromApi() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');  
+    final response = await http.get(Uri.parse('${APIConfig.getaddressEndpoint}$userId/'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        userLocationMarker = LatLng(
+          double.parse(data['x_map']),
+          double.parse(data['y_map']),
+        );
+        addressText = data['address_line'];
+      });
+    } else {
+      throw Exception('فشل في جلب الموقع');
+    }
+    await getCurrentLocation(userLocationMarker.latitude, userLocationMarker.longitude); // استدعاء لجلب الموقع الحالي
+  }
+
+  Future<void> getCurrentLocation(double latitude, double longitude) async {
     bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
@@ -56,13 +73,34 @@ class AddressesScreenState extends State<AddressesScreen> {
       if (permissionGranted != location_.PermissionStatus.granted) return;
     }
 
+    if (latitude != null||longitude != null) {
+      setState(() {
+        userLocationMarker = LatLng(latitude, longitude);
+      });
+    }else{
+        final prefs = await SharedPreferences.getInstance();
+        double? latitude = prefs.getDouble('latitude');
+        double? longitude = prefs.getDouble('longitude');
+
+        if (latitude != null && longitude != null) {
+          setState(() {
+            userLocationMarker = LatLng(latitude, longitude);
+          });
+        } else {
+          // هنا يمكنك التعامل مع الحالة إذا كانت القيم غير موجودة (null)
+          print("No latitude and longitude saved in SharedPreferences.");
+        }
+
+    }
+
+    currentLocation = await location.getLocation();
+    if (currentLocation != null) {
+    }
+
+    // Initialize locationSubscription only after location is fetched
     locationSubscription = location.onLocationChanged.listen((location_.LocationData newLoc) {
-      if (!mounted) return; 
       setState(() {
         currentLocation = newLoc;
-        if (newLoc.latitude != null && newLoc.longitude != null) {
-          userLocationMarker = LatLng(newLoc.latitude!, newLoc.longitude!);
-        }
       });
     });
   }
@@ -72,12 +110,10 @@ class AddressesScreenState extends State<AddressesScreen> {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        if (mounted) {
-          setState(() {
-            addressText = "${place.street ?? ''}, ${place.locality ?? ''}, ${place.country ?? ''}";
-            addressController.text = addressText;
-          });
-        }
+        setState(() {
+          addressText = "${place.street ?? ''}, ${place.locality ?? ''}, ${place.country ?? ''}";
+          addressController.text = addressText;
+        });
       }
     } catch (e) {
       print('Error retrieving address: $e');
@@ -85,30 +121,26 @@ class AddressesScreenState extends State<AddressesScreen> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    if (!mounted) return; 
+    // تحديث مكان الدبوس عند تحريك الكاميرا
     setState(() {
       userLocationMarker = LatLng(position.target.latitude, position.target.longitude);
-      coordinatesText = "إحداثيات: ${userLocationMarker.latitude}, ${userLocationMarker.longitude}";
     });
   }
 
   void _onCameraIdle() {
-    if (!mounted) return; 
+    // تحديث العنوان عند توقف الكاميرا
     _updateAddress(userLocationMarker.latitude, userLocationMarker.longitude);
   }
 
   void _goToCurrentLocation() async {
-    if (currentLocation != null) {
-      final GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newLatLngZoom(
-        LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
-        16,
-      ));
-    }
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(
+      LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
+      16,
+    ));
   }
 
   void _confirmAddress() {
-    if (!mounted) return; 
     setState(() {
       addressText = addressController.text;
     });
@@ -178,15 +210,18 @@ class AddressesScreenState extends State<AddressesScreen> {
 
   @override
   void dispose() {
+    // Check if locationSubscription is initialized before cancelling it
+    if (locationSubscription != null) {
+      locationSubscription!.cancel();  
+    }
     super.dispose();
-    locationSubscription.cancel();  
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("تحديد الموقع")),
-      body: currentLocation == null || customMarker == null
+      body: userLocationMarker.latitude == 0.0 && userLocationMarker.longitude == 0.0
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -194,7 +229,7 @@ class AddressesScreenState extends State<AddressesScreen> {
                   child: GoogleMap(
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
-                      target: LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
+                      target: userLocationMarker,
                       zoom: 16,
                     ),
                     markers: {
@@ -245,13 +280,13 @@ class AddressesScreenState extends State<AddressesScreen> {
               ],
             ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(left: 16.0, bottom: 210.0), // ضبط المسافة من الحواف
+        padding: const EdgeInsets.only(left: 16.0, bottom: 210.0),
         child: Align(
           alignment: Alignment.bottomLeft,
           child: FloatingActionButton(
             onPressed: _goToCurrentLocation,
             child: Icon(Icons.my_location),
-            backgroundColor: const Color.fromARGB(255, 236, 47, 195)
+            backgroundColor: const Color.fromARGB(255, 255, 219, 247),
           ),
         ),
       ),

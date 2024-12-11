@@ -124,9 +124,9 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           _futureLaundries = fetchProducts(); // إعادة تحميل البيانات من جديد
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم حذف المحفوظات بنجاح')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم حذف المحفوظات بنجاح')));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل في حذف المحفوظات')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل في حذف المحفوظات')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
@@ -147,11 +147,11 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           future: _futureLaundries, // استخدم الـ future الذي تم تعيينه
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator()); // مؤشر تحميل
-            } else if (snapshot.hasError) {
-              return Center(child: Text('حدث خطأ: ${snapshot.error}')); // عرض رسالة الخطأ
+              return const Center(child: CircularProgressIndicator()); // مؤشر تحميل
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('لا توجد خدمات.')); // إذا لم توجد بيانات
+              return const Center(child: Text('لا توجد مغاسل محفوظة.')); // إذا لم توجد بيانات
+            } else if (snapshot.hasError) {
+              return Center(child: Text('شحدث خطأ: ${snapshot.error}')); // عرض رسالة الخطأ
             }
 
             final products = snapshot.data!; // البيانات المحملة
@@ -195,7 +195,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                               child: CircleAvatar(
                                 backgroundColor: Colors.red,
                                 child: IconButton(
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.delete,
                                     color: Colors.white,
                                   ),

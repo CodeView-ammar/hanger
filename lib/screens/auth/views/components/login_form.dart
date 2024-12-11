@@ -22,27 +22,7 @@ class LogInForm extends StatelessWidget {
           Row(
             children: [
               // مفتاح الدولة
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: DropdownButton<String>(
-                  value: '+966', // مثال: مفتاح الدولة للمملكة العربية السعودية
-                  items: <String>['+966'] // أضف مفاتيح الدول هنا
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    // يمكنك إضافة منطق لتخزين مفتاح الدولة المحدد
-                  },
-                  underline: const SizedBox(), // لإخفاء الخط السفلي
-                ),
-              ),
+              
               Expanded(
                 child: TextFormField(
                   onSaved: (phone) {
@@ -66,6 +46,28 @@ class LogInForm extends StatelessWidget {
                   decoration: const InputDecoration(
                     hintText: "رقم الجوال",
                   ),
+                ),
+              ),
+            
+            Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: DropdownButton<String>(
+                  value: '966+', // مثال: مفتاح الدولة للمملكة العربية السعودية
+                  items: <String>['966+'] 
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    // يمكنك إضافة منطق لتخزين مفتاح الدولة المحدد
+                  },
+                  underline: const SizedBox(), // لإخفاء الخط السفلي
                 ),
               ),
             ],

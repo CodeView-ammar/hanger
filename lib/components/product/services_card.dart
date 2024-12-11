@@ -89,7 +89,7 @@ class ServicesCard extends StatelessWidget {
                       ? Row(
                           children: [
                             Text(
-                              "س.ر$priceAfetDiscount",
+                              "ر.س$priceAfetDiscount",
                               style: const TextStyle(
                                 color: Color(0xFF31B0D8),
                                 fontWeight: FontWeight.w500,
@@ -98,7 +98,7 @@ class ServicesCard extends StatelessWidget {
                             ),
                             const SizedBox(width: defaultPadding / 4),
                             Text(
-                              "س.ر$price",
+                              "ر.س$price",
                               style: TextStyle(
                                 color: Theme.of(context)
                                     .textTheme
@@ -111,7 +111,7 @@ class ServicesCard extends StatelessWidget {
                           ],
                         )
                       : Text(
-                          "س.ر$price",
+                          "ر.س$price",
                           style: const TextStyle(
                             color: Color(0xFF31B0D8),
                             fontWeight: FontWeight.w500,

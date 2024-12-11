@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                           } else {
-                            _showErrorDialog("Error sending OTP");
+                            _showErrorDialog("خطاء في ارسال الرسالة الرجاء المحاولة لاحقا");
                           }
                         } else {
                           _showErrorDialog("يرجى إدخال رقم الجوال");
