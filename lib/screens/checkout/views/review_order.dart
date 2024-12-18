@@ -10,7 +10,9 @@ import 'package:shop/screens/checkout/views/payment_method.dart';
 import 'package:shop/screens/checkout/views/time.dart';
 
 class ReviewOrderScreen extends StatefulWidget {
-  const ReviewOrderScreen({Key? key}) : super(key: key);
+  final int laundryId;
+
+  const ReviewOrderScreen({Key? key, required this.laundryId}) : super(key: key);
 
   @override
   _ReviewOrderScreenState createState() => _ReviewOrderScreenState();
@@ -24,16 +26,122 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
   late GoogleMapController mapController;
   late BitmapDescriptor customMarker; // المتغير المستخدم لتخزين صورة الدبوس المخصص
   LatLng userLocationMarker = LatLng(0.0, 0.0);
-
+  // متغير لتخزين خيار الدروب داون
+  String selectedPayment = 'عادي'; // القيمة الافتراضية
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
   @override
   void initState() {
     super.initState();
     _loadCustomMarker(); // تحميل الصورة الخاصة بالدبوس في البداية
     fetchAddress();
+    fetchDefaultPaymentMethod();
+  }
+String? defaultPaymentMethod; // متغير لتخزين طريقة الدفع الافتراضية
+
+Future<void> fetchDefaultPaymentMethod() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userid');
+  
+  // Send the request to the API
+  final response = await http.post(
+    Uri.parse(APIConfig.PaymentUrl), // Replace with your API URL
+    headers: {'Content-Type': 'application/json'},
+    body: json.encode({
+      'user': userId,
+    }),
+  );
+  
+  // Check if the request was successful
+  if (response.statusCode == 200) {
+    // Decode the response body
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    
+    setState(() {
+      // Set the default payment method
+      if(responseData['name']=="COD")defaultPaymentMethod = "الدفع عند الاستلام";
+      if(responseData['name']=="CARD")defaultPaymentMethod = "الدفع باستخدام البطاقة";
+      if(responseData['name']=="STC")defaultPaymentMethod = "الدفع باستخدام STC";
+    
+    });
+  } else {
+    // يمكنك إضافة معالجة الخطأ هنا في حالة فشل الطلب
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('يجب تحديد طريقة الدفع')),
+    );
+  }
+}
+Future<void> submitOrder() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userid');
+
+  // التأكد من أن المغسلة واسم المستخدم موجودين
+  if (userId == null) {
+    // إذا لم يكن هناك معرف للمستخدم
+    print("لا يوجد معرف للمستخدم.");
+    return;
   }
 
-  // تحميل صورة الدبوس المخصص من الأصول
-  Future<void> _loadCustomMarker() async {
+  // تحديث طريقة الدفع
+  if (defaultPaymentMethod == "الدفع عند الاستلام") defaultPaymentMethod = "COD";
+  if (defaultPaymentMethod == "الدفع باستخدام البطاقة") defaultPaymentMethod = "CARD";
+  if (defaultPaymentMethod == "الدفع باستخدام STC") defaultPaymentMethod = "STC";
+
+  try {
+    final response = await http.post(
+      Uri.parse('${APIConfig.orderSubmitUrl}'), // استبدال بـ API الخاص بك
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'laundryId': widget.laundryId,
+        'userId': userId,
+        'delegateNote': delegateNote, // إضافة الملاحظة
+        'paymentMethod': defaultPaymentMethod, // إضافة اختيار العميل
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      // إذا تم قبول الطلب بنجاح
+      print('تم إرسال الطلب بنجاح!');
+
+      // عرض مودال تأكيد النجاح
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('تم إرسال الطلب بنجاح!'),
+            content: const Text('تم إرسال طلبك بنجاح إلى المغسلة.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('موافق'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // إغلاق المودال
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    entryPointScreenRoute, // الشاشة التي تلي التحقق
+                    ModalRoute.withName(logInScreenRoute),
+                  ); // التوجيه إلى الشاشة الرئيسية
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // إذا حدث خطأ
+      print('فشل في إرسال الطلب: ${response.body}');
+    }
+  } catch (e) {
+    print("حدث خطأ أثناء إرسال الطلب: $e");
+  }
+}
+
+
+
+// تحميل صورة الدبوس المخصص من الأصول
+Future<void> _loadCustomMarker() async {
     customMarker = await BitmapDescriptor.fromAssetImage(
       ImageConfiguration(size: Size(38, 38)),
       'assets/icons/pin.png', // قم بتعديل المسار حسب مكان وجود الصورة في مشروعك
@@ -53,16 +161,30 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
         address = utf8.decode(data['address_line'].codeUnits);
         x_map = double.tryParse(data['x_map'].toString());
         y_map = double.tryParse(data['y_map'].toString());
-        print('X: $x_map');
-        print('Y: $y_map');
+        print(widget.laundryId);
 
-        // تحريك الكاميرا إلى موقع الدبوس بعد تحميل القيم
-        if (x_map != null && y_map != null) {
+        // تحريك الكاميرا إلى موقع الدبوس بعد تحميل القيم فقط إذا كان mapController قد تم تهيئته
+        if (x_map != null && y_map != null && mapController != null) {
+          try{
           mapController.moveCamera(CameraUpdate.newLatLng(LatLng(x_map!, y_map!)));
+          }catch(e){
+            print(e);
+          }
+        }else{
+          // يمكنك إضافة معالجة الخطأ هنا في حالة فشل الطلب
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('فشل في تحميل العنوان.')),
+          );
+          Navigator.pushNamed(context, addressesScreenRoute);
+          
         }
       });
     } else {
-      throw Exception('فشل في تحميل العنوان');
+    // يمكنك إضافة معالجة الخطأ هنا في حالة فشل الطلب
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('فشل في تحميل العنوان.')),
+    );
+     Navigator.pushNamed(context, addressesScreenRoute);
     }
   }
 
@@ -131,6 +253,11 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                         zoomGesturesEnabled: false,
                         onMapCreated: (GoogleMapController controller) {
                           mapController = controller;
+
+                          // تحريك الكاميرا عند إنشاء الخريطة إذا كانت القيم متاحة
+                          if (x_map != null && y_map != null) {
+                            mapController.moveCamera(CameraUpdate.newLatLng(LatLng(x_map!, y_map!)));
+                          }
                         },
                       ),
                     ),
@@ -236,6 +363,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                   ],
                 ),
               ),
+        
               const SizedBox(height: 24),
               const Text(
                 'تفاصيل الدفع',
@@ -266,72 +394,69 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!), // حدود خفيفة
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.payment, size: 24), // أيقونة الدفع
-                            SizedBox(width: 8),
-                            Text(
-                              'طرق الدفع',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            const Row(
+                              children: [
+                                Icon(Icons.payment, size: 24),
+                                SizedBox(width: 8),
+                                Text(
+                                  'طرق الدفع',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddCardDetailsScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
+                                child: Text(
+                                  'اختر',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    backgroundColor: Color.fromRGBO(251, 255, 1, 1),
+                                    color: Color.fromRGBO(10, 10, 10, 1),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentMethods(),
-                              ),
-                            );
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
-                            child: Text(
-                              'اختر',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
-                                backgroundColor: Color.fromRGBO(251, 255, 1, 1),
-                                color: Color.fromRGBO(10, 10, 10, 1),
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
+                        const SizedBox(height: 8),
+                        Text(
+                          defaultPaymentMethod ?? 'جاري تحميل طريقة الدفع...', // عرض القيمة المناسبة
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'لم يتم تحديد طريقة الدفع',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
               const SizedBox(height: 24),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // منطق تنفيذ الطلب
-                },
+                ElevatedButton(
+                onPressed: submitOrder, // عند الضغط، يتم إرسال الطلب
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),

@@ -1,22 +1,30 @@
 class APIConfig {
-  static const String _baseUrl = 'https://hanger.metasoft-ar.com/api';
-  
-  static String get launderiesEndpoint => '$_baseUrl/laundries/';
-  static String get bannerEndpoint => '$_baseUrl/slide-show/';
-  static String get userEndpoint => '$_baseUrl/users/register/';
-  static String get markEndpoint_get => '$_baseUrl/user_laundry_marks_a/';
-  static String get markEndpoint_delete => '$_baseUrl/user_laundry_marks_delete/';
-  static String get servicesEndpoint => '$_baseUrl/services/';
-  static String get otpphoneEndpoint => '$_baseUrl/user_phone/';
-  static String get useraddEndpoint => '$_baseUrl/users/';
-  static String get markerEndpoint => '$_baseUrl/user_laundry_marks/';
-  static String get CartsEndpoint => '$_baseUrl/carts/';
-  static String get addressesEndpoint => '$_baseUrl/addresses/';
-  static String get getaddressEndpoint => '$_baseUrl/address/';
-  static String get cartfilterEndpoint => '$_baseUrl/cart/filter/';
-  static String get cartupdateEndpoint => '$_baseUrl/cart/update/';
-  static String get cartRemoveEndpoint => '$_baseUrl/cart/delete/';
+  static const String _baseUrl = 'https://hanger.metasoft-ar.com';
+  static const String api_baseUrl='$_baseUrl/api';
+ 
+  static const String static_baseUrl='$_baseUrl/static';
 
+  static String get launderiesEndpoint => '$api_baseUrl/laundries/';
+  static String get bannerEndpoint => '$api_baseUrl/slide-show/';
+  static String get userEndpoint => '$api_baseUrl/users/register/';
+  static String get markEndpoint_get => '$api_baseUrl/user_laundry_marks_a/';
+  static String get markEndpoint_delete => '$api_baseUrl/user_laundry_marks_delete/';
+  static String get servicesEndpoint => '$api_baseUrl/services/';
+  static String get otpphoneEndpoint => '$api_baseUrl/user_phone/';
+  static String get useraddEndpoint => '$api_baseUrl/users/';
+  static String get markerEndpoint => '$api_baseUrl/user_laundry_marks/';
+  static String get CartsEndpoint => '$api_baseUrl/carts/';
+  static String get addressesEndpoint => '$api_baseUrl/addresses/';
+  static String get getaddressEndpoint => '$api_baseUrl/address/';
+  static String get cartfilterEndpoint => '$api_baseUrl/cart/filter/';
+  static String get cartupdateEndpoint => '$api_baseUrl/cart/update/';
+  static String get cartRemoveEndpoint => '$api_baseUrl/cart/delete/';
+  static String get orderSubmitUrl => '$api_baseUrl/submit-order/';
+  static String get addPaymentUrl => '$api_baseUrl/add-payment-method/';
+  static String get PaymentUrl => '$api_baseUrl/payment-methods/';
+  static String get orderuserUrl => '$api_baseUrl/orders-user/';
+  static String get orderstatusUrl => '$api_baseUrl/orders-status/';
+  static String get orderdetilsUrl => '$api_baseUrl/orders-detils/';
 
   static String get otpapiverifyEndpoint => "https://api.authentica.sa/api/sdk/v1/verifyOTP";
   static String get otpapisendOTPEndpoint => "https://api.authentica.sa/api/sdk/v1/sendOTP";

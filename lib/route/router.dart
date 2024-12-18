@@ -173,9 +173,9 @@ case productReviewsScreenRoute:
     //   return MaterialPageRoute(
     //     builder: (context) => const SubDiscoverScreen(),
     //   );
-    case discoverScreenRoute:
+    case ordersScreenRoute:
       return MaterialPageRoute(
-        builder: (context) => const DiscoverScreen(),
+        builder: (context) => const OrderScreen(),
       );
     case onSaleScreenRoute:
       return MaterialPageRoute(

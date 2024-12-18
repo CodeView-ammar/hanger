@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // لإضافة Clipboard
 import 'package:shop/components/api_extintion/otp_api.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/constants.dart';
@@ -42,54 +43,55 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
     }
   }
 
-Future<String?> saveDataToApi(Map<String, dynamic> data) async {
-  try {
-    // تحقق مما إذا كان رقم الجوال موجودًا مسبقًا
-    final phone = data['phone']; // افترض أن رقم الجوال موجود في الـ data
-    final checkResponse = await http.get(
-      Uri.parse('${APIConfig.otpphoneEndpoint}$phone'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+  Future<String?> saveDataToApi(Map<String, dynamic> data) async {
+    try {
+      // تحقق مما إذا كان رقم الجوال موجودًا مسبقًا
+      final phone = data['phone']; // افترض أن رقم الجوال موجود في الـ data
+      final checkResponse = await http.get(
+        Uri.parse('${APIConfig.otpphoneEndpoint}$phone'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (checkResponse.statusCode == 200) {
-      final checkData = json.decode(checkResponse.body);
-      if (checkData.isNotEmpty) {
-        // إذا كان رقم الجوال موجودًا، إرجاع الـ id
-        return checkData[0]['id'].toString();
+      if (checkResponse.statusCode == 200) {
+        final checkData = json.decode(checkResponse.body);
+        if (checkData.isNotEmpty) {
+          // إذا كان رقم الجوال موجودًا، إرجاع الـ id
+          return checkData[0]['id'].toString();
+        }
       }
-    }
 
-    // إرسال البيانات عبر HTTP POST إذا لم يكن رقم الجوال موجودًا
-    final response = await http.post(
-      Uri.parse(APIConfig.useraddEndpoint),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(data),
-    );
+      // إرسال البيانات عبر HTTP POST إذا لم يكن رقم الجوال موجودًا
+      final response = await http.post(
+        Uri.parse(APIConfig.useraddEndpoint),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(data),
+      );
 
-    // التحقق من حالة الاستجابة
-    if (response.statusCode == 201) {
-      final responseData = json.decode(response.body);
-      print("Data submitted successfully.");
-      return responseData['id'].toString();
-    } else {
-      try {
+      // التحقق من حالة الاستجابة
+      if (response.statusCode == 201) {
         final responseData = json.decode(response.body);
-        print("API error: ${responseData['detail'] ?? 'Unknown error'}");
-      } catch (e) {
-        print("Error parsing response: $e");
-        print("Response body: ${response.body}");
+        print("Data submitted successfully.");
+        return responseData['id'].toString();
+      } else {
+        try {
+          final responseData = json.decode(response.body);
+          print("API error: ${responseData['detail'] ?? 'Unknown error'}");
+        } catch (e) {
+          print("Error parsing response: $e");
+          print("Response body: ${response.body}");
+        }
+        return "";
       }
+    } catch (e) {
+      print("Error: $e");
       return "";
     }
-  } catch (e) {
-    print("Error: $e");
-    return "";
   }
-}
+
   Future<Position> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -101,28 +103,47 @@ Future<String?> saveDataToApi(Map<String, dynamic> data) async {
 
     return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   }
-Future<bool> location() async{
+
+  Future<bool> location() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-   try {
+    try {
       Position position = await _getCurrentLocation();
       await prefs.setDouble('latitude', position.latitude);
       await prefs.setDouble('longitude', position.longitude);
-      print( position.latitude);
-      print( position.longitude);
+      print(position.latitude);
+      print(position.longitude);
     } catch (e) {
       print('Error getting location: $e');
-    return false;
+      return false;
     }
-  return true;
-}
+    return true;
+  }
+
   Future<bool> logIn(String phone, String id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userPhone', phone);
     await prefs.setString('userid', id);
-                          location();
+    print(id);
+
+    location();
     // جلب الموقع وحفظه
-   
+
     return true; // افترض أن تسجيل الدخول ناجح
+  }
+
+  // دالة للصق النص من الحافظة
+  Future<void> _pasteOTPFromClipboard() async {
+    final clipboardText = await Clipboard.getData('text/plain');
+    if (clipboardText != null && clipboardText.text != null) {
+      String otpFromClipboard = clipboardText.text!;
+      if (otpFromClipboard.length == 4 && otpFromClipboard.contains(RegExp(r'^\d{4}$'))) {
+        // لصق الرمز مباشرة في الحقول
+        _otpController1.text = otpFromClipboard[0];
+        _otpController2.text = otpFromClipboard[1];
+        _otpController3.text = otpFromClipboard[2];
+        _otpController4.text = otpFromClipboard[3];
+      }
+    }
   }
 
   @override
@@ -242,6 +263,7 @@ Future<bool> location() async{
           }
           return null;
         },
+        onEditingComplete: _pasteOTPFromClipboard, // عند الانتهاء من التحرير، حاول الصق الرمز من الحافظة
       ),
     );
   }

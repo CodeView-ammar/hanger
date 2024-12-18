@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shop/constants.dart';
+import 'package:shop/screens/checkout/views/review_order.dart';
 
 class AddedToCartMessageScreen extends StatelessWidget {
-  const AddedToCartMessageScreen({super.key});
+  final int laundryId;  // تحديد النوع كـ final لضمان أنه لا يتغير بعد تمريره
+
+  // التأكد من أن laundryId ليس null بإعطائه قيمة افتراضية
+  const AddedToCartMessageScreen({super.key, required this.laundryId});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +48,15 @@ class AddedToCartMessageScreen extends StatelessWidget {
               const SizedBox(height: defaultPadding),
               ElevatedButton(
                 onPressed: () {
-                  // هنا يمكن إضافة وظائف خاصة بإتمام الدفع، مثل الانتقال إلى شاشة الدفع
+                  // التأكد من أن laundryId ليس null
+                  final validLaundryId = laundryId ?? 0;  // تعيين قيمة افتراضية إذا كانت null
+                  // الانتقال إلى شاشة ReviewOrderScreen مع تمرير laundryId
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewOrderScreen(laundryId: validLaundryId),
+                    ),
+                  );
                 },
                 child: const Text("الدفع"),
               ),

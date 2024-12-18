@@ -138,19 +138,20 @@ Future<void> updateCartQuantity(int laundryId, int serviceId, int newQuantity) a
     );
   }
 }
-  // دالة جلب البيانات من الـ API
-  Future<void> fetchCartData(int laundryId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userid');
+Future<void> fetchCartData(int laundryId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userid');
 
-    if (userId != null) {
-      final response = await http.get(
-        Uri.parse('${APIConfig.cartfilterEndpoint}?user=$userId&laundry=$laundryId'),
-      );
+  if (userId != null) {
+    final response = await http.get(
+      Uri.parse('${APIConfig.cartfilterEndpoint}?user=$userId&laundry=$laundryId'),
+    );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // التحقق من أن الـ Widget ما زال في شجرة الـ Widget قبل استدعاء setState
+      if (mounted) {
         setState(() {
           if (data['carts'] != null && data['carts'].isNotEmpty) {
             cartItems = List<Map<String, dynamic>>.from(data['carts']);
@@ -161,29 +162,30 @@ Future<void> updateCartQuantity(int laundryId, int serviceId, int newQuantity) a
             totalPrice = 0.0;
           }
         });
-      } else {
-        throw Exception('فشل في جلب البيانات من الـ API');
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('خطأ'),
-            content: const Text('لم يتم العثور على معرف المستخدم. يرجى تسجيل الدخول أولاً.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('موافق'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
+      throw Exception('فشل في جلب البيانات من الـ API');
     }
+  } else {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('خطأ'),
+          content: const Text('لم يتم العثور على معرف المستخدم. يرجى تسجيل الدخول أولاً.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('موافق'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+}
 
   // دالة تحديث الكمية محليًا وفي الـ API
   void updateQuantity(int index, int delta) {
@@ -281,14 +283,40 @@ print(serviceId);
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-            Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>  ReviewOrderScreen()),
-          );    
-              },
-              child: const Text("متابعة إلى الدفع"),
-            ),
+                  onPressed: () {
+                    // احصل على الـ laundryId من العناصر في السلة
+                    final int laundryId = cartItems.isNotEmpty ? cartItems[0]['laundry'] : 0;
+
+                    // تأكد من أن laundryId ليس صفرًا
+                    if (laundryId > 0) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewOrderScreen(laundryId: laundryId),
+                        ),
+                      );
+                    } else {
+                      // معالجة الحالة عندما لا يوجد laundryId
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('خطأ'),
+                            content: const Text('لا يوجد مغسلة محددة.'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('موافق'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  child: const Text("متابعة إلى الدفع"),
+                ),
+
           ],
         ),
       ),

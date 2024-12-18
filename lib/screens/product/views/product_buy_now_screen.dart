@@ -14,6 +14,7 @@ import 'components/unit_price.dart';
 class ProductBuyNowScreen extends StatefulWidget {
   final String serviceName;
   final double servicePrice;
+  final double serveiceUrgentPrice;
   final String serviceImage;
   final int quantity;
   final int laundry;
@@ -23,6 +24,7 @@ class ProductBuyNowScreen extends StatefulWidget {
     super.key,
     required this.serviceName,
     required this.servicePrice,
+    required this.serveiceUrgentPrice,
     required this.serviceImage,
     required this.quantity,
     required this.laundry,
@@ -35,7 +37,9 @@ class ProductBuyNowScreen extends StatefulWidget {
 
 class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
   int _quantity = 1;
+  String _serviceType = 'عادية';  // إضافة متغير لتحديد نوع الخدمة (مستعجلة أو عادية)
 
+  // دالة لإضافة المنتج إلى السلة
   Future<void> _addToCart() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');  // جلب ID المستخدم من SharedPreferences
@@ -43,40 +47,58 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
     if (userId == null) {
       // إذا لم يكن ID المستخدم موجودًا، يمكنك عرض رسالة خطأ
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('لا يوجد مستخدم مسجل.'),
         ),
       );
       return;
     }
 
+    // تحديد السعر بناءً على نوع الخدمة
+    double selectedPrice = (_serviceType == 'مستعجلة') ? widget.serveiceUrgentPrice : widget.servicePrice;
+    String tServicetype = (_serviceType == 'مستعجلة') ? 'urgent' : 'normal';
+
     final url = APIConfig.CartsEndpoint;  // استبدل بـ URL الخاص بك
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'price': widget.servicePrice,
-        'quantity': _quantity,
-        'user': userId,  // استخدام ID المستخدم من SharedPreferences
-        'laundry': widget.laundry,
-        'service': widget.serviceId,  
-      }),
-    );
-    print(response.statusCode);
-    if (response.statusCode == 201 ||response.statusCode == 200) {
-      // إذا تم إضافة المنتج بنجاح
-      customModalBottomSheet(
-        context,
-        isDismissible: false,
-        child: const AddedToCartMessageScreen(),
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'price': selectedPrice,  // استخدام السعر الذي تم اختياره بناءً على نوع الخدمة
+          "urgent_price": widget.serveiceUrgentPrice,
+          'quantity': _quantity,
+          'user': userId,
+          'laundry': widget.laundry,
+          'service': widget.serviceId,
+          'service_type': tServicetype,  // إرسال نوع الخدمة
+        }),
       );
-    } else {
-      // معالجة الخطأ
+
+      print(response.statusCode);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        // إذا تم إضافة المنتج بنجاح
+
+        customModalBottomSheet(
+          context,
+          isDismissible: false,
+          child: AddedToCartMessageScreen(laundryId: widget.laundry),
+        );
+      } else {
+        // معالجة الخطأ
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('فشل في إضافة المنتج إلى السلة!'),
+          ),
+        );
+      }
+    } catch (e) {
+      // في حال حدوث أي خطأ في الاتصال
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('فشل في إضافة المنتج إلى السلة!'),
+          content: Text('حدث خطأ في الاتصال!'),
         ),
       );
     }
@@ -84,7 +106,10 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double totalPrice = widget.servicePrice * _quantity;
+    // حساب السعر الإجمالي بناءً على نوع الخدمة
+    double totalPrice = (_serviceType == 'مستعجلة') 
+        ? widget.serveiceUrgentPrice * _quantity
+        : widget.servicePrice * _quantity;
 
     return Scaffold(
       bottomNavigationBar: CartButton(
@@ -117,28 +142,72 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.all(defaultPadding),
                   sliver: SliverToBoxAdapter(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: UnitPrice(
-                            price: widget.servicePrice,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: UnitPrice(
+                                price: (_serviceType == 'مستعجلة') 
+                                  ? widget.serveiceUrgentPrice
+                                  : widget.servicePrice,
+                              ),
+                            ),
+                            ProductQuantity(
+                              numOfItem: _quantity,
+                              onIncrement: () {
+                                setState(() {
+                                  _quantity++;
+                                });
+                              },
+                              onDecrement: () {
+                                setState(() {
+                                  if (_quantity > 1) {
+                                    _quantity--;
+                                  }
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        ProductQuantity(
-                          numOfItem: _quantity,
-                          onIncrement: () {
-                            setState(() {
-                              _quantity++;
-                            });
-                          },
-                          onDecrement: () {
-                            setState(() {
-                              if (_quantity > 1) {
-                                _quantity--;
-                              }
-                            });
-                          },
+                        const SizedBox(height: defaultPadding),
+                        // إضافة اختيار نوع الخدمة كقائمة
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("نوع الخدمة:", style: Theme.of(context).textTheme.bodyLarge),
+                            ListTile(
+                              title: Text("عادية"),
+                              leading: Transform.scale(
+                                scale: 1.5,  // تكبير الراديو بوتون
+                                child: Radio<String>(
+                                  value: 'عادية',
+                                  groupValue: _serviceType,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _serviceType = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              title: Text("مستعجلة"),
+                              leading: Transform.scale(
+                                scale: 1.5,  // تكبير الراديو بوتون
+                                child: Radio<String>(
+                                  value: 'مستعجلة',
+                                  groupValue: _serviceType,
+                                  onChanged: (String? value) {
+                                    setState(() {
+                                      _serviceType = value!;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

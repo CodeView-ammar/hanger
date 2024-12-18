@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location_;
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
+
 
 class AddressesScreen extends StatefulWidget {
   const AddressesScreen({Key? key}) : super(key: key);
@@ -40,25 +42,84 @@ class AddressesScreenState extends State<AddressesScreen> {
     );
   }
 
-  Future<void> fetchLocationFromApi() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userid');  
-    final response = await http.get(Uri.parse('${APIConfig.getaddressEndpoint}$userId/'));
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+Future<void> fetchLocationFromApi() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userid');  
+  
+  // جلب الموقع المحفوظ في SharedPreferences
+  double? savedLatitude = prefs.getDouble('latitude');
+  double? savedLongitude = prefs.getDouble('longitude');
+
+  // إرسال طلب HTTP لجلب البيانات من الـ API
+  final response = await http.get(Uri.parse('${APIConfig.getaddressEndpoint}$userId/'));
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    setState(() {
+      // إذا كانت البيانات موجودة من الـ API
+      userLocationMarker = LatLng(
+        double.parse(data['x_map']),
+        double.parse(data['y_map']),
+      );
+      addressText = data['address_line'];
+      
+      // حفظ البيانات في SharedPreferences
+      prefs.setDouble('latitude', double.parse(data['x_map']));
+      prefs.setDouble('longitude', double.parse(data['y_map']));
+    });
+  } else {
+    if (savedLatitude != null && savedLongitude != null) {
       setState(() {
-        userLocationMarker = LatLng(
-          double.parse(data['x_map']),
-          double.parse(data['y_map']),
-        );
-        addressText = data['address_line'];
+        // إذا كانت القيم محفوظة في SharedPreferences
+        userLocationMarker = LatLng(savedLatitude, savedLongitude);
+        addressText = 'العنوان غير متوفر'; // يمكن أن تضع عنوانًا افتراضيًا إذا رغبت
       });
     } else {
-      throw Exception('فشل في جلب الموقع');
+      // جلب الموقع الحالي للمستخدم إذا لم تكن القيم موجودة في SharedPreferences أو الـ API
+      Position position = await _getCurrentLocation();
+
+      setState(() {
+        // استخدام الموقع الحالي للمستخدم
+        userLocationMarker = LatLng(position.latitude, position.longitude);
+        addressText = ''; // يمكنك تعديل العنوان بناءً على الموقع الحالي
+      });
     }
-    await getCurrentLocation(userLocationMarker.latitude, userLocationMarker.longitude); // استدعاء لجلب الموقع الحالي
   }
+
+  // استدعاء دالة getCurrentLocation لتحديث الموقع
+  await getCurrentLocation(userLocationMarker.latitude, userLocationMarker.longitude);
+}
+
+// دالة لجلب الموقع الحالي للمستخدم باستخدام Geolocator
+Future<Position> _getCurrentLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // تحقق من حالة خدمة الموقع
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // إذا كانت خدمة الموقع غير مفعلّة، يمكنك إظهار رسالة أو اتخاذ إجراء آخر
+    return Future.error('خدمة الموقع غير مفعلّة');
+  }
+
+  // تحقق من صلاحية الأذونات
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('إذن الوصول إلى الموقع مرفوض');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return Future.error('إذن الوصول إلى الموقع مرفوض بشكل دائم');
+  }
+
+  // الحصول على الموقع الحالي
+  return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+}
+
 
   Future<void> getCurrentLocation(double latitude, double longitude) async {
     bool serviceEnabled = await location.serviceEnabled();
@@ -133,12 +194,19 @@ class AddressesScreenState extends State<AddressesScreen> {
   }
 
   void _goToCurrentLocation() async {
-    final GoogleMapController controller = await _controller.future;
+  final GoogleMapController controller = await _controller.future;
+
+  // تحقق من أن currentLocation ليست null
+  if (currentLocation != null) {
     controller.animateCamera(CameraUpdate.newLatLngZoom(
       LatLng(currentLocation!.latitude!, currentLocation!.longitude!),
       16,
     ));
+  } else {
+    // يمكنك إضافة معالجة في حالة كان currentLocation null
+    print("الموقع الحالي غير متاح");
   }
+}
 
   void _confirmAddress() {
     setState(() {

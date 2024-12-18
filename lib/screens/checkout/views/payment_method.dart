@@ -2,14 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/screens/checkout/tools/add_card_screen.dart';
 
 class AddCardDetailsScreen extends StatelessWidget {
   const AddCardDetailsScreen({Key? key}) : super(key: key);
 
   // دالة لإضافة طريقة الدفع عبر API
-  Future<void> addPaymentMethod(String name, String description) async {
-    final url = Uri.parse('https://hanger.metasoft-ar.com/api/add-payment-method/');
+  Future<void> addPaymentMethod(String name, String description ,BuildContext context) async {
+    final url = Uri.parse(APIConfig.addPaymentUrl);
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');  
 
@@ -22,11 +23,15 @@ class AddCardDetailsScreen extends StatelessWidget {
           'description': description,
           'is_active': true,
           'user': userId,
+          'default':true,
+        
         }),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
+
         print('تم إضافة طريقة الدفع بنجاح');
+        Navigator.pop(context);
       } else {
         print('حدث خطأ: ${response.body}');
       }
@@ -38,6 +43,9 @@ class AddCardDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+              title: const Text("اختر طريقة الدفع"),
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -57,7 +65,7 @@ class AddCardDetailsScreen extends StatelessWidget {
                     logo: 'assets/icons/money_hand.jpg',
                     onTap: () {
                       // استدعاء دالة إضافة طريقة الدفع عند النقر على الدفع الإلكتروني
-                      addPaymentMethod('COD', 'الدفع عند الاستلام');
+                      addPaymentMethod('COD', 'الدفع عند الاستلام',context);
                     },
                   ),
                   const Divider(),
@@ -67,7 +75,7 @@ class AddCardDetailsScreen extends StatelessWidget {
                     logo: 'assets/icons/stc_pay.png',
                     onTap: () {
                       // استدعاء دالة إضافة طريقة الدفع عند النقر على STC Pay
-                      addPaymentMethod('STC', 'دفع لجهة معينة باستخدام رقم الجوال');
+                      addPaymentMethod('STC', 'دفع لجهة معينة باستخدام رقم الجوال',context);
                     },
                   ),
                   const Divider(),
@@ -77,7 +85,7 @@ class AddCardDetailsScreen extends StatelessWidget {
                     logo: 'assets/icons/credit_card.png',
                     onTap: () {
                     
-                      // addPaymentMethod('CARD', 'إضافة بطاقة جديدة');
+                      // addPaymentMethod('CARD', 'إضافة بطاقة جديدة',context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const AddCardScreen()),

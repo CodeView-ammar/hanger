@@ -25,17 +25,24 @@ class LogInForm extends StatelessWidget {
               
               Expanded(
                 child: TextFormField(
-                  onSaved: (phone) {
-                    if (phone != null) {
-                      // دمج مفتاح الدولة مع الرقم المدخل
-                      onPhoneSaved("+966$phone"); // حفظ الرقم كاملاً
-                    }
-                  },
+                    onSaved: (phone) {
+                        if (phone != null) {
+                          // التحقق إذا كان الرقم يبدأ بـ "05"
+                          if (phone.startsWith("05")) {
+                            // إزالة الصفر الأول
+                            phone = phone.substring(1);
+                            
+                          }
+                          // دمج مفتاح الدولة مع الرقم المدخل
+                          onPhoneSaved("+966$phone"); // حفظ الرقم كاملاً
+                        }
+                      },
+
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'يرجى إدخال رقم الجوال';
                     }
-                    if (value.length != 9) {
+                    if (value.length != 9 && value.length != 10) {
                       return 'يجب أن يكون الرقم مكوناً من 9 أرقام';
                     }
                     return null;

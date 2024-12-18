@@ -37,7 +37,7 @@ class ServiceModel {
       description: json['description'],
       price: double.parse(json['price']),
       urgentPrice: double.parse(json['urgent_price']),
-      image: json['image'],
+      image: json['image'] ?? '',  // في حال كانت الصورة غير موجودة سيتم تعيين قيمة فارغة
     );
   }
 }
@@ -73,23 +73,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     fetchTotalPrice(widget.id);  // جلب total_price من الـ API عند تحميل الصفحة
   }
 
-  // دالة لجلب الـ total_price من الـ API
   Future<void> fetchTotalPrice(serverid) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');  // جلب ID المستخدم من SharedPreferences
     final response = await http.get(Uri.parse('${APIConfig.cartfilterEndpoint}?user=$userId&laundry=$serverid'));
 
     if (response.statusCode == 200) {
-      
       final data = jsonDecode(response.body);
-      setState(() {
-        if (data['total_price'] == 0) {
-          totalPrice = 0.0; // إذا كانت total_price تساوي 0، قم بتعيين totalPrice إلى 0.0
-        } else {
-          totalPrice = data['total_price']; // تحديث الـ total_price
-        }
-      });
-
+      if (mounted) {
+        setState(() {
+          if (data['total_price'] == '') {
+            totalPrice = 0.0; // إذا كانت total_price تساوي 0، قم بتعيين totalPrice إلى 0.0
+          } else {
+            // إذا كانت القيمة من نوع int، قم بتحويلها إلى double
+            totalPrice = (data['total_price'] is int)
+                ? (data['total_price'] as int).toDouble()
+                : data['total_price']; // تحديث الـ total_price
+          }
+        });
+      }
     } else {
       throw Exception('فشل في جلب total_price');
     }
@@ -106,30 +108,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
- void showCustomBottomSheet(BuildContext context, ServiceModel service, int quantity) async {
-  await customModalBottomSheet(
-    context,
-    height: MediaQuery.of(context).size.height * 0.92,
-    child: ProductBuyNowScreen(
-      serviceId: service.id,
-      serviceName: service.name,
-      servicePrice: service.price * quantity,
-      serviceImage: service.image,
-      quantity: quantity,
-      laundry: widget.id,
-    ),
-  );
+  void showCustomBottomSheet(BuildContext context, ServiceModel service, int quantity) async {
+    await customModalBottomSheet(
+      context,
+      height: MediaQuery.of(context).size.height * 0.92,
+      child: ProductBuyNowScreen(
+        serviceId: service.id,
+        serviceName: service.name,
+        servicePrice: service.price * quantity,
+        serveiceUrgentPrice: service.urgentPrice * quantity,
+        serviceImage: service.image,
+        quantity: quantity,
+        laundry: widget.id,
+      ),
+    );
 
-  // تحديث totalPrice بعد إغلاق الشاشة
-  await fetchTotalPrice(widget.id); 
-}
+    // تحديث totalPrice بعد إغلاق الشاشة
+    await fetchTotalPrice(widget.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar:CartButton(
-              price: totalPrice,
-              press: () {
-                Navigator.push(
+      bottomNavigationBar: CartButton(
+        price: totalPrice,
+        press: () async {
+          // تحقق مما إذا كانت قيمة totalPrice 0
+          if (totalPrice == 0.0) {
+            // إذا كانت القيمة 0، أظهر رسالة للمستخدم
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('لا يمكن الانتقال إلى السلة لأن الإجمالي هو 0')),
+            );
+          } else {
+            // إذا كانت قيمة totalPrice ليست 0، قم بالانتقال إلى شاشة السلة
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => CartScreen(),
@@ -138,8 +150,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ),
             );
-              },
-            ),
+
+            // بعد العودة من شاشة السلة، قم بتحديث الإجمالي
+            await fetchTotalPrice(widget.id);
+            // تحديث الإجمالي في واجهة المستخدم
+            setState(() {
+              // هنا يمكنك تحديث أي حالة إذا لزم الأمر، لكن في هذا المثال لا حاجة لذلك
+            });
+          }
+        },
+      ),
       body: SafeArea(
         child: FutureBuilder<List<ServiceModel>>(
           future: _services,
@@ -165,7 +185,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                     ],
                   ),
-                  ProductImages(images: [widget.image]),
+                  ProductImages(
+                    images: [
+                      widget.image.isEmpty ? 'https://hanger.metasoft-ar.com/static/images/store.jpg' : widget.image, // إذا كانت الصورة فارغة، استخدم الصورة الافتراضية
+                    ],
+                  ),
                   ServiceInfo(
                     brand: widget.address,
                     title: widget.name,
@@ -191,13 +215,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           child: ListTile(
                             leading: Image.network(
-                              service.image,
+                              service.image.isEmpty ? 'https://hanger.metasoft-ar.com/static/images/store.jpg' : service.image,  // استخدم الصورة الافتراضية إذا كانت الصورة فارغة
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
                             ),
                             title: Text(service.name),
-                            subtitle: Text('السعر: \س.ر ${service.price.toStringAsFixed(2)}'),
+                            subtitle: Text('السعر: \ر.س ${service.price.toStringAsFixed(2)}'),
                             trailing: IconButton(
                               icon: Icon(Icons.add),
                               onPressed: () {

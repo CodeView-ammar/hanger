@@ -14,9 +14,7 @@ class ProductModel {
   final String name;
   final String? address;
   final String? image;
-  // ignore: non_constant_identifier_names
   final double? x_latitude; 
-  // ignore: non_constant_identifier_names
   final double? y_longitude;
 
   ProductModel({
@@ -24,9 +22,7 @@ class ProductModel {
     required this.name,
     this.address,
     this.image,
-    // ignore: non_constant_identifier_names
     this.x_latitude,
-    // ignore: non_constant_identifier_names
     this.y_longitude,
   });
 
@@ -35,9 +31,9 @@ class ProductModel {
       id: json['id'],
       name: utf8.decode(json['name'].codeUnits),
       address: utf8.decode(json['address'].codeUnits),
-      image: json['image'],
-      x_latitude: json['x_map'] != null ? double.parse(json['x_map'].toString()) : null,
-      y_longitude: json['y_map'] != null ? double.parse(json['y_map'].toString()) : null,
+      image: json['image']?.isNotEmpty == true ? json['image'] : null, // Check if image is empty or null
+      x_latitude: json['x_map'] != "" ? double.parse(json['x_map'].toString()) : 0,
+      y_longitude: json['y_map'] != "" ? double.parse(json['y_map'].toString()) : 0,
     );
   }
 }
@@ -94,10 +90,14 @@ class _BestSellersState extends State<BestSellers> {
 
   Future<void> _getUserLocation() async {
     var userLocation = await _locationService.getCurrentLocation();
-    setState(() {
-      _userLatitude = userLocation['latitude'];
-      _userLongitude = userLocation['longitude'];
-    });
+  
+    // تحقق مما إذا كان العنصر لا يزال موجودًا قبل استدعاء setState
+    if (mounted) {
+      setState(() {
+        _userLatitude = userLocation['latitude'];
+        _userLongitude = userLocation['longitude'];
+      });
+    }
   }
 
   double _getDistanceToLaundry(ProductModel product) {
@@ -116,6 +116,8 @@ class _BestSellersState extends State<BestSellers> {
   Future<List<ProductModel>> fetchProducts({int page = 1}) async {
     final response = await http.get(Uri.parse("${APIConfig.launderiesEndpoint}?page=$page"));
     if (response.statusCode == 200) {
+      print(response.body);
+
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => ProductModel.fromJson(item)).toList();
     } else {
@@ -133,7 +135,6 @@ class _BestSellersState extends State<BestSellers> {
       setState(() {
         _currentPage = 1;
         _allProducts = refreshedProducts;
-
         _displayedProducts = _allProducts.take(10).toList();
         _displayedProducts.sort((a, b) {
           double distanceA = _getDistanceToLaundry(a);
@@ -142,7 +143,6 @@ class _BestSellersState extends State<BestSellers> {
         });
       });
     } catch (e) {
-      // ignore: avoid_print
       print("Error refreshing products: $e");
     } finally {
       setState(() {
@@ -186,7 +186,6 @@ class _BestSellersState extends State<BestSellers> {
         });
       });
     } catch (e) {
-      // ignore: avoid_print
       print("Error loading more products: $e");
     } finally {
       setState(() {
@@ -198,7 +197,7 @@ class _BestSellersState extends State<BestSellers> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: _refreshProducts, // تحديد الدالة التي سيتم استدعاؤها عند السحب
+      onRefresh: _refreshProducts,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -210,6 +209,7 @@ class _BestSellersState extends State<BestSellers> {
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
+       
           FutureBuilder<List<ProductModel>>(
             future: _fetchedProducts,
             builder: (context, snapshot) {
@@ -219,10 +219,8 @@ class _BestSellersState extends State<BestSellers> {
                   _allProducts = demoBestSellersProducts;
                   _displayedProducts = _allProducts.take(10).toList();
 
-                  // التحقق من وجود مسافة محفوظة
                   _getSavedDistance().then((savedDistance) {
                     if (savedDistance == null) {
-                      // حساب المسافة للمرة الأولى وحفظها
                       final distance = _getDistanceToLaundry(demoBestSellersProducts[0]);
                       _saveDistanceToStorage(distance);
                     }
@@ -261,16 +259,20 @@ class _BestSellersState extends State<BestSellers> {
             },
           ),
         ],
+       
       ),
     );
   }
+Widget _buildProductList(List<ProductModel> products) {
+  return ListView.builder(
+    physics: const NeverScrollableScrollPhysics(),
+    shrinkWrap: true,
+    itemCount: products.length,
+    itemBuilder: (context, index) {
+      // Use the image from the product if available, else use the default image
+      String imageUrl = products[index].image ?? 'assets/images/store.jpg';
 
-  Widget _buildProductList(List<ProductModel> products) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: products.length,
-      itemBuilder: (context, index) => Padding(
+      return Padding(
         padding: const EdgeInsets.only(
           left: defaultPadding,
           right: defaultPadding,
@@ -304,10 +306,26 @@ class _BestSellersState extends State<BestSellers> {
                 children: [
                   ClipRect(
                     child: Image.network(
-                      products[index].image ?? '',
+                      imageUrl,
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback to local image if network image fails
+                        return Image.asset(
+                          'assets/images/store.jpg', // Your local default image
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -332,7 +350,7 @@ class _BestSellersState extends State<BestSellers> {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              '${_getDistanceToLaundry(products[index]).toStringAsFixed(2)} km',
+                              '${_getDistanceToLaundry(products[index]).toStringAsFixed(2)} كم',
                               style: const TextStyle(fontSize: 14, color: Colors.white),
                             ),
                           ],
@@ -345,7 +363,8 @@ class _BestSellersState extends State<BestSellers> {
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 }
