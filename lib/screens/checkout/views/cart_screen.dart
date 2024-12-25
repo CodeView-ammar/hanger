@@ -27,7 +27,7 @@ Future<void> removeItemFromCart(int laundryId, int serviceId) async {
     final response = await http.delete(
       Uri.parse('${APIConfig.cartRemoveEndpoint}?user=$userId&laundry=$laundryId&service=$serviceId'),
     );
-    print(response);
+    // print(response);
     if (response.statusCode == 200) {
       print('تم إزالة العنصر من السلة بنجاح');
       // تحديث واجهة المستخدم بعد إزالة العنصر
@@ -205,8 +205,8 @@ Future<void> fetchCartData(int laundryId) async {
 void removeItem(int index) {
   final laundryId = cartItems[index]['laundry']; // الحصول على laundryId
   final serviceId = cartItems[index]['service']; // الحصول على serviceId
-print(laundryId);
-print(serviceId);
+// print(laundryId);
+// print(serviceId);
   removeItemFromCart(laundryId, serviceId); // إزالة العنصر عبر API
 
   setState(() {

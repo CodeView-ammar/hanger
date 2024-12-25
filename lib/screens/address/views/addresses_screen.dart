@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
+import 'package:shop/route/route_constants.dart';
 
 
 class AddressesScreen extends StatefulWidget {
@@ -44,8 +45,13 @@ class AddressesScreenState extends State<AddressesScreen> {
 
 
 Future<void> fetchLocationFromApi() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getString('userid');  
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userid');
+
+    if (userId == null) {
+      Navigator.pushNamed(context, logInScreenRoute);
+      return;
+    }
   
   // جلب الموقع المحفوظ في SharedPreferences
   double? savedLatitude = prefs.getDouble('latitude');
@@ -220,6 +226,7 @@ Future<Position> _getCurrentLocation() async {
     final url = APIConfig.addressesEndpoint;
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');  
+    
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

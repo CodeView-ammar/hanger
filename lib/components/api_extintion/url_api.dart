@@ -25,7 +25,9 @@ class APIConfig {
   static String get orderuserUrl => '$api_baseUrl/orders-user/';
   static String get orderstatusUrl => '$api_baseUrl/orders-status/';
   static String get orderdetilsUrl => '$api_baseUrl/orders-detils/';
-
+  static String get orderitemget_order_itemsUrl => '$api_baseUrl/orders-items/get_order_items/';
+  static String get orderStatusEdit => '$api_baseUrl/order';
+ 
   static String get otpapiverifyEndpoint => "https://api.authentica.sa/api/sdk/v1/verifyOTP";
   static String get otpapisendOTPEndpoint => "https://api.authentica.sa/api/sdk/v1/sendOTP";
   

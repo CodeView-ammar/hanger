@@ -126,6 +126,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     // تحديث totalPrice بعد إغلاق الشاشة
     await fetchTotalPrice(widget.id);
   }
+ Future<void> saveLaundryData(String laundry) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid'); // استرجاع userId من SharedPreferences إذا كان موجودًا
+
+    final url = APIConfig.markerEndpoint;
+
+    final body = json.encode({
+      'user': userId, // إذا لم يكن هناك userId في SharedPreferences، يتم إرسال المستخدم من المعامل
+      'laundry': int.parse(laundry),     // البيانات المغسلة التي يتم إرسالها
+    });
+
+    try {
+     final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+      print(response);
+     print('Sending data: $body');
+      if (response.statusCode == 200 || response.statusCode ==201) {
+        // إذا تم الحفظ بنجاح
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حفظ بيانات المغسلة بنجاح')),
+        );
+      } else {
+        // إذا كانت هناك مشكلة في الاتصال أو حفظ البيانات
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل في حفظ البيانات')),
+        );
+      }
+    } catch (e) {
+      // إذا حدثت مشكلة في الاتصال بالخادم
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('حدث خطأ أثناء الاتصال بالخادم')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +216,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     floating: true,
                     actions: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          saveLaundryData('1');
+                        },
                         icon: SvgPicture.asset(
                           "assets/icons/Bookmark.svg",
                           color: Theme.of(context).textTheme.bodyLarge!.color,
@@ -187,7 +228,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   ProductImages(
                     images: [
-                      widget.image.isEmpty ? 'https://hanger.metasoft-ar.com/static/images/store.jpg' : widget.image, // إذا كانت الصورة فارغة، استخدم الصورة الافتراضية
+                      widget.image.isEmpty ? '${APIConfig.static_baseUrl}/images/store.jpg' : widget.image, // إذا كانت الصورة فارغة، استخدم الصورة الافتراضية
                     ],
                   ),
                   ServiceInfo(
@@ -215,7 +256,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           child: ListTile(
                             leading: Image.network(
-                              service.image.isEmpty ? 'https://hanger.metasoft-ar.com/static/images/store.jpg' : service.image,  // استخدم الصورة الافتراضية إذا كانت الصورة فارغة
+                              service.image.isEmpty ? '${APIConfig.static_baseUrl}/images/store.jpg' : service.image,  // استخدم الصورة الافتراضية إذا كانت الصورة فارغة
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,

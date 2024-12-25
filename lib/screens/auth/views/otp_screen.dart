@@ -110,8 +110,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
       Position position = await _getCurrentLocation();
       await prefs.setDouble('latitude', position.latitude);
       await prefs.setDouble('longitude', position.longitude);
-      print(position.latitude);
-      print(position.longitude);
     } catch (e) {
       print('Error getting location: $e');
       return false;
@@ -123,7 +121,6 @@ class _VerifyOTPScreenState extends State<VerifyOTPScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userPhone', phone);
     await prefs.setString('userid', id);
-    print(id);
 
     location();
     // جلب الموقع وحفظه

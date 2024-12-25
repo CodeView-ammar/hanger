@@ -76,7 +76,7 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
         }),
       );
 
-      print(response.statusCode);
+      // print(response.statusCode);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         // إذا تم إضافة المنتج بنجاح

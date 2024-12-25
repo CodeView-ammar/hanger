@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/constants.dart';
 import 'package:intl/intl.dart';
+import 'package:shop/route/route_constants.dart';
 import 'package:shop/screens/discover/views/order_details.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class _OrderScreenState extends State<OrderScreen> {
     String? userid = prefs.getString('userid');
 
     if (userid == null) {
-      print('User ID is not available');
+      Navigator.pushNamed(context, logInScreenRoute);
       return;
     }
 

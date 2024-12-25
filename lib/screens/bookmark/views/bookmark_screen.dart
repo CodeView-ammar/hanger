@@ -112,11 +112,8 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   // دالة لحذف خدمة من المحفوظات
   void removeLaundry(int id, int userId) async {
     try {
-      // إرسال الطلب لحذف العنصر من الـ API
-      print(id);
-      print(userId);
+      // إرسال الطلب لحذف 
       final response = await http.delete(Uri.parse('${APIConfig.markEndpoint_delete}$userId/$id/'));
-      print(response.statusCode);
       // التحقق من حالة الاستجابة
       if (response.statusCode == 204) {
         // إذا تم الحذف بنجاح، أعد تحميل المنتجات

@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/screens/checkout/tools/model/paymodel.dart';
 import 'package:shop/screens/checkout/tools/model/source/creditcardmodel.dart';
 import 'package:shop/screens/checkout/tools/moyasar_payment.dart';
+import 'package:geideapay/geideapay.dart';
+import 'package:geideapay/models/address.dart';
+import 'package:geideapay/widgets/checkout/checkout_options.dart';
 
 class AddCardScreen extends StatefulWidget {
   const AddCardScreen({Key? key}) : super(key: key);
@@ -15,345 +18,101 @@ class AddCardScreen extends StatefulWidget {
 }
 
 class _AddCardScreenState extends State<AddCardScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _plugin = GeideapayPlugin();
+  bool _isInitialized = false; // لتتبع حالة التهيئة
 
-  // المتغيرات لتخزين بيانات البطاقة
-  String cardNumber = '';
-  String cardHolderName = '';
-  String expiryMonth = '';
-  String expiryYear = '';
-  String cvv = '';
-
-  // إعدادات الدفع عبر Moyasar
-  final String publishableApiKey = 'sk_test_NGyCJ2hNRoHjusfowDePNucyR5J6bFxhkx8kycHp';
-  final String callbackUrl = "https://example.com/thankyou"; 
-
-  // دالة التعامل مع نتيجة الدفع
-  void onPaymentResult(PayModel result) {
-    print(result.status);
-    switch (result.status) {
-      case PaymentStatus.paid:
-        print("تم الدفع بنجاح");
-        _addCardDetails(); // إضافة البطاقة إلى النظام
-        break;
-      case PaymentStatus.failed:
-        print("فشل الدفع: ${result}"); 
-        break;
-      case PaymentStatus.initiated:
-        print("تم إنشاء الدفع ولكن لم يدفع حامل البطاقة بعد: ${result}"); 
-        break;
-      default:
-        print("حالة غير معروفة: ${result.status}");
-    }
+  @override
+  void initState() {
+    super.initState();
+    _initializePlugin(); // تهيئة SDK عند بدء التشغيل
   }
 
-  // دالة لإضافة بيانات البطاقة عبر الـ API بعد التحقق من الدفع
-  Future<void> _addCardDetails() async {
-    final url = Uri.parse('https://hanger.metasoft-ar.com/api/add-payment-method/');
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userid');
-
+  Future<void> _initializePlugin() async {
     try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'name': 'Credit Card',
-          'description': 'بطاقة ائتمانية جديدة',
-          'is_active': true,
-          'user': userId,
-          'card_number': cardNumber,
-          'card_holder_name': cardHolderName,
-          'expiry_date': '$expiryMonth/$expiryYear',
-          'cvv': cvv,
-        }),
+      var serverEnvironment = ServerEnvironment;
+      await _plugin.initialize(
+        publicKey: "0293c7c6-c005-41d8-821b-132af79602e5",
+        apiPassword: "9ce86693-0b09-476b-853f-87a8d966b50d",
+        serverEnvironment:ServerEnvironmentModel("KSA-PROD","https://api.ksamerchant.geidea.net","https://www.ksamerchant.geidea.net/hpp/checkout/?") , // تعيين البيئة حسب الحاجة
       );
-
-      if (response.statusCode == 201) {
-        print('تم إضافة البطاقة بنجاح');
-        Navigator.pop(context);
-      } else {
-        print('حدث خطأ أثناء إضافة البطاقة: ${response.statusCode} - ${response.body}');
-      }
+      setState(() {
+        _isInitialized = true; // تم التهيئة بنجاح
+      });
     } catch (e) {
-      print('فشل الاتصال بالخادم: $e');
+      _showMessage("Geideapay SDK has not been initialized.");// التعامل مع الأخطاء إذا لزم الأمر
     }
   }
 
-
-
- static Future<void> sendAuthenticationResult(String url_) async {
-    final String authResult = 'AUTHENTICATED';  // القيمة التي نريد إرسالها
-    
-    final url = Uri.parse(url_.replaceAll("prepare", "acs_emulator"));
-    final requestData = {
-      'authentication_result': authResult,
-    };
-
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: json.encode(requestData),
-      );
-      print(url);
-      if (response.statusCode == 200) {
-        // إذا كانت الاستجابة ناجحة
-        print('تم إرسال البيانات بنجاح');
-      } else {
-        // إذا حدث خطأ في الاستجابة
-        print('حدث خطأ في إرسال البيانات');
-      }
-    } catch (e) {
-      print('خطأ في الاتصال: $e');
-    }
-  }
   // دالة لبدء عملية الدفع
   Future<void> _startPaymentProcess() async {
-    try {
-      PayModel result = await MoyasarPayment().creditCard(
-        amount: 100, 
-        publishableKey: publishableApiKey, 
-        cardHolderName: cardHolderName, 
-        cardNumber: cardNumber, 
-        cvv: int.parse(cvv), 
-        expiryManth: int.parse(expiryMonth), 
-        expiryYear: int.parse(expiryYear), 
-        description: "Verify that the card is linked $cardHolderName",
-        callbackUrl: 'https://example.com/orders',
-        
-        );
-        // print(result.type);
-        // print(result.message);
-        // print(result.error);
-        CreditcardModel creditcardModel = CreditcardModel.fromJson(result.source);
-        print(creditcardModel.toJson());
-      sendAuthenticationResult(creditcardModel.toJson()['transaction_url']);
-
-      // معالجة نتيجة الدفع
-      onPaymentResult(result);
-    } catch (e) {
-      print('فشل عملية الدفع: $e');
+    if (!_isInitialized) {
+      _showMessage("Geideapay SDK has not been initialized.");
+      return; // لا تبدأ عملية الدفع إذا لم يتم التهيئة
     }
-  }
 
-  // دالة لإنشاء الحقول النصية الأخرى
-  Widget _buildTextField({
-    required String label,
-    required IconData icon,
-    required Function(String) onChanged,
-    required String? Function(String?) validator,
-    TextInputType? keyboardType,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, color: Colors.blueAccent),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        keyboardType: keyboardType,
-        onChanged: onChanged,
-        validator: validator,
-      ),
-    );
-  }
+    try {
+      Address billingAddress = Address(
+        city: "Riyadh",
+        countryCode: "SAU",
+        street: "Street 1",
+        postCode: "1000",
+      );
+      Address shippingAddress = Address(
+        city: "Riyadh",
+        countryCode: "SAU",
+        street: "Street 1",
+        postCode: "1000",
+      );
 
-  // دالة لإنشاء حقل رقم البطاقة مع أيقونة فيزا
-  Widget _buildCardNumberField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          Image.asset(
-            'assets/icons/credit_card.png',
-            width: 40,
-            height: 40,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextFormField(
-              decoration: InputDecoration(
-                labelText: 'رقم البطاقة',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  cardNumber = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'يرجى إدخال رقم البطاقة';
-                }
-                if (!RegExp(r'^\d{16}$').hasMatch(value)) {
-                  return 'رقم البطاقة يجب أن يتكون من 16 رقمًا';
-                }
-                return null;
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+      CheckoutOptions checkoutOptions = CheckoutOptions(
+        123.45,
+        "SAR",
+        callbackUrl: "https://website.hook/", // Optional
+        returnUrl: "https://returnurl.com", 
+        lang: "AR", // Optional
+        billingAddress: billingAddress, // Optional
+        shippingAddress: shippingAddress, // Optional
+        customerEmail: "email@noreply.test", // Optional
+        merchantReferenceID: "1234", // Optional
+        paymentIntentId: null, // Optional
+        paymentOperation: "Pay", // Optional
+        showAddress: true, // Optional
+        showEmail: true, // Optional
+      );
 
-  // دالة لإنشاء حقل تاريخ الانتهاء (شهر وسنة)
-  Widget _buildExpiryDateFields() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              decoration: InputDecoration(
-                labelText: 'الشهر (MM)',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  expiryMonth = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'يرجى إدخال الشهر';
-                }
-                if (!RegExp(r'^(0[1-9]|1[0-2])$').hasMatch(value)) {
-                  return 'الشهر يجب أن يكون بين 01 و 12';
-                }
-                return null;
-              },
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextFormField(
-              decoration: InputDecoration(
-                labelText: 'السنة (YY)',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  expiryYear = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'يرجى إدخال السنة';
-                }
-                if (!RegExp(r'^\d{2}$').hasMatch(value)) {
-                  return 'السنة يجب أن تكون بتنسيق YY';
-                }
-                return null;
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+      OrderApiResponse response = await _plugin.checkout(
+        context: context,
+        checkoutOptions: checkoutOptions,
+      );
+
+      _showMessage("Geideapay SDK has not been initialized.");
+      // Payment successful, order returned in response
+      print(response.detailedResponseMessage);
+      print(response.toString());
+      // _updateStatus(response.detailedResponseMessage, truncate(response.toString()));
+    } catch (e) {
+      _showMessage("Geideapay SDK has not been initialized.");// _showMessage(e.toString());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('إضافة بطاقة جديدة'),
-        backgroundColor: Colors.blueAccent,
+        title: const Text("Add Card"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              const Text(
-                'الرجاء إدخال بيانات البطاقة',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              _buildCardNumberField(),
-              _buildTextField(
-                label: 'اسم حامل البطاقة',
-                icon: Icons.person,
-                onChanged: (value) {
-                  setState(() {
-                    cardHolderName = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال اسم حامل البطاقة';
-                  }
-                  return null;
-                },
-              ),
-              _buildExpiryDateFields(),
-              _buildTextField(
-                label: 'CVV',
-                icon: Icons.lock,
-                onChanged: (value) {
-                  setState(() {
-                    cvv = value;
-                  });
-                },
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'يرجى إدخال CVV';
-                  }
-                  if (value.length != 3) {
-                    return 'CVV يجب أن يتكون من 3 أرقام';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'سيتم سحب 1 ريال لتأكيد صحة بيانات البطاقة. سيتم إرجاع المبلغ بعد التحقق.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.redAccent,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _startPaymentProcess();
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  'إضافة البطاقة',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ],
-          ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: _isInitialized ? _startPaymentProcess : null,
+          child: const Text("Start Payment"),
         ),
       ),
     );
   }
+void _showMessage(String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(message)),
+  );
 }
+}
+

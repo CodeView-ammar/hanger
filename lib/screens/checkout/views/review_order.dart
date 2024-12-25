@@ -161,7 +161,7 @@ Future<void> _loadCustomMarker() async {
         address = utf8.decode(data['address_line'].codeUnits);
         x_map = double.tryParse(data['x_map'].toString());
         y_map = double.tryParse(data['y_map'].toString());
-        print(widget.laundryId);
+        // print(widget.laundryId);
 
         // تحريك الكاميرا إلى موقع الدبوس بعد تحميل القيم فقط إذا كان mapController قد تم تهيئته
         if (x_map != null && y_map != null && mapController != null) {

@@ -116,7 +116,7 @@ class _BestSellersState extends State<BestSellers> {
   Future<List<ProductModel>> fetchProducts({int page = 1}) async {
     final response = await http.get(Uri.parse("${APIConfig.launderiesEndpoint}?page=$page"));
     if (response.statusCode == 200) {
-      print(response.body);
+      // print(response.body);
 
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => ProductModel.fromJson(item)).toList();
@@ -270,7 +270,7 @@ Widget _buildProductList(List<ProductModel> products) {
     itemCount: products.length,
     itemBuilder: (context, index) {
       // Use the image from the product if available, else use the default image
-      String imageUrl = products[index].image ?? 'assets/images/store.jpg';
+    String imageUrl = products[index].image ?? '${APIConfig.static_baseUrl}/images/store.jpg';
 
       return Padding(
         padding: const EdgeInsets.only(

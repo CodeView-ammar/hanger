@@ -48,8 +48,13 @@ class _EntryPointState extends State<EntryPoint> {
   }
 
   Future<void> _fetchOrderStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getString('userid');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userid');
+
+    if (userId == null) {
+      Navigator.pushNamed(context, logInScreenRoute);
+      return;
+    }
     final response = await http.get(Uri.parse('${APIConfig.orderstatusUrl}?user=$userId'));
 
     if (response.statusCode == 200) {
