@@ -28,6 +28,11 @@ class APIConfig {
   static String get orderitemget_order_itemsUrl => '$api_baseUrl/orders-items/get_order_items/';
   static String get orderStatusEdit => '$api_baseUrl/order';
  
+ 
+  static String get apiMap=>'AIzaSyAF2Uo1kHze6N9E8xAwEcrp5Mqw0ol0ekk';
+  static String get apiPayment=>'pk_test_gLVjbsVjL1U2XZiKtFD9sRr6abDTJZS3GgKstC2G';
+ 
+ 
   static String get otpapiverifyEndpoint => "https://api.authentica.sa/api/sdk/v1/verifyOTP";
   static String get otpapisendOTPEndpoint => "https://api.authentica.sa/api/sdk/v1/sendOTP";
   

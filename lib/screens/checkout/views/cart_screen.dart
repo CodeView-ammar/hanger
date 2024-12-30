@@ -292,7 +292,7 @@ void removeItem(int index) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReviewOrderScreen(laundryId: laundryId),
+                          builder: (context) => ReviewOrderScreen(laundryId: laundryId,total:totalPrice,isPaid: false),
                         ),
                       );
                     } else {

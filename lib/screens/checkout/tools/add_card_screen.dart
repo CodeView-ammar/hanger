@@ -1,118 +1,136 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:moyasar/moyasar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shop/screens/checkout/tools/model/paymodel.dart';
-import 'package:shop/screens/checkout/tools/model/source/creditcardmodel.dart';
-import 'package:shop/screens/checkout/tools/moyasar_payment.dart';
-import 'package:geideapay/geideapay.dart';
-import 'package:geideapay/models/address.dart';
-import 'package:geideapay/widgets/checkout/checkout_options.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shop/components/api_extintion/url_api.dart';
+import 'package:shop/screens/checkout/views/review_order.dart';
 
 class AddCardScreen extends StatefulWidget {
-  const AddCardScreen({Key? key}) : super(key: key);
+  final double total; // المبلغ الذي تم تمريره
+  final int laundryId; // ID المغسلة
+
+  AddCardScreen({super.key, required this.total, required this.laundryId});
 
   @override
   _AddCardScreenState createState() => _AddCardScreenState();
 }
 
 class _AddCardScreenState extends State<AddCardScreen> {
-  final _plugin = GeideapayPlugin();
-  bool _isInitialized = false; // لتتبع حالة التهيئة
-
   @override
   void initState() {
     super.initState();
-    _initializePlugin(); // تهيئة SDK عند بدء التشغيل
   }
 
-  Future<void> _initializePlugin() async {
-    try {
-      var serverEnvironment = ServerEnvironment;
-      await _plugin.initialize(
-        publicKey: "0293c7c6-c005-41d8-821b-132af79602e5",
-        apiPassword: "9ce86693-0b09-476b-853f-87a8d966b50d",
-        serverEnvironment:ServerEnvironmentModel("KSA-PROD","https://api.ksamerchant.geidea.net","https://www.ksamerchant.geidea.net/hpp/checkout/?") , // تعيين البيئة حسب الحاجة
-      );
-      setState(() {
-        _isInitialized = true; // تم التهيئة بنجاح
-      });
-    } catch (e) {
-      _showMessage("Geideapay SDK has not been initialized.");// التعامل مع الأخطاء إذا لزم الأمر
+  void onPaymentResult(BuildContext context, PaymentResponse result) {
+    if (result is PaymentResponse) {
+      switch (result.status) {
+        case PaymentStatus.paid:
+          print("تم الدفع بنجاح");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("تم الدفع بنجاح")),
+          );
+
+          // حفظ بيانات البطاقة بعد التحقق من الدفع
+          // saveCardData(result, context);
+  // تأجيل الرجوع حتى بعد تحديث الشجرة
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          // Navigator.pop(context, true);  // تم الدفع بنجاح
+          // الانتقال إلى ReviewOrderScreen مع تمرير المتغيرات
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReviewOrderScreen(
+                laundryId: widget.laundryId,
+                total: widget.total,
+                isPaid: true,
+              ),
+            ),
+          );
+        });
+          break;
+        case PaymentStatus.failed:
+          print("فشل في الدفع");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("فشل في الدفع")),
+          );
+          break;
+        // يمكنك إضافة معالجة للحالات الأخرى إذا لزم الأمر
+        case PaymentStatus.initiated:
+        case PaymentStatus.authorized:
+        case PaymentStatus.captured:
+          // TODO: Handle these cases if needed.
+          break;
+      }
     }
   }
 
-  // دالة لبدء عملية الدفع
-  Future<void> _startPaymentProcess() async {
-    if (!_isInitialized) {
-      _showMessage("Geideapay SDK has not been initialized.");
-      return; // لا تبدأ عملية الدفع إذا لم يتم التهيئة
-    }
+  Future<void> saveCardData(PaymentResponse result, BuildContext context) async {
+    // final url = Uri.parse('https://hanger.metasoft-ar.com/api/payment-methods-details/');
 
-    try {
-      Address billingAddress = Address(
-        city: "Riyadh",
-        countryCode: "SAU",
-        street: "Street 1",
-        postCode: "1000",
-      );
-      Address shippingAddress = Address(
-        city: "Riyadh",
-        countryCode: "SAU",
-        street: "Street 1",
-        postCode: "1000",
-      );
+    // الحصول على البيانات من PaymentResponse أو مدخلات المستخدم
+    // String cardNumber = "1123091231"; // استبدل هذا برقم البطاقة الفعلي
+    // String cardHolderName = "عمار"; // استبدل هذا باسم صاحب البطاقة
+    // String cardExpiryDate = "12/25"; // استبدل هذا بتاريخ انتهاء البطاقة
+    // String cvv = "124"; // استبدل هذا بـ CVV الخاص بالبطاقة
 
-      CheckoutOptions checkoutOptions = CheckoutOptions(
-        123.45,
-        "SAR",
-        callbackUrl: "https://website.hook/", // Optional
-        returnUrl: "https://returnurl.com", 
-        lang: "AR", // Optional
-        billingAddress: billingAddress, // Optional
-        shippingAddress: shippingAddress, // Optional
-        customerEmail: "email@noreply.test", // Optional
-        merchantReferenceID: "1234", // Optional
-        paymentIntentId: null, // Optional
-        paymentOperation: "Pay", // Optional
-        showAddress: true, // Optional
-        showEmail: true, // Optional
-      );
+    // final response = await http.post(
+    //   url,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: jsonEncode({
+    //     'card_name': cardHolderName,
+    //     'card_number': cardNumber,
+    //     'card_expiry_date': cardExpiryDate,
+    //     'cvv': cvv,
+    //     'payment_method': "CARD",
+    //   }),
+    // );
 
-      OrderApiResponse response = await _plugin.checkout(
-        context: context,
-        checkoutOptions: checkoutOptions,
-      );
-
-      _showMessage("Geideapay SDK has not been initialized.");
-      // Payment successful, order returned in response
-      print(response.detailedResponseMessage);
-      print(response.toString());
-      // _updateStatus(response.detailedResponseMessage, truncate(response.toString()));
-    } catch (e) {
-      _showMessage("Geideapay SDK has not been initialized.");// _showMessage(e.toString());
-    }
+    // print(response.statusCode);
+    // if (response.statusCode == 200 || response.statusCode == 201) {
+    //   print("تم حفظ بيانات البطاقة بنجاح");
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text("تم حفظ بيانات البطاقة بنجاح")),
+    //   );
+    // } else {
+    //   print("فشل في حفظ بيانات البطاقة: ${response.body}");
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text("فشل في حفظ بيانات البطاقة")),
+    //   );
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
+    final paymentConfig = PaymentConfig(
+      publishableApiKey: APIConfig.apiPayment,
+      amount: (widget.total * 100).toInt(),
+      description: 'خصم 1 ريال للتحقق من البطاقة',
+      metadata: {'size': '250g'},
+      applePay: ApplePayConfig(
+        merchantId: 'YOUR_MERCHANT_ID',
+        label: 'معلاق',
+        manual: false,
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Card"),
+        title: const Text("إضافة وسيلة الدفع"),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: _isInitialized ? _startPaymentProcess : null,
-          child: const Text("Start Payment"),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            CreditCard(
+              config: paymentConfig,
+              onPaymentResult: (result) => onPaymentResult(context, result),
+              locale: const Localization.ar(),
+            ),
+          ],
         ),
       ),
     );
   }
-void _showMessage(String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message)),
-  );
 }
-}
-

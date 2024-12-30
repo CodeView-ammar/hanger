@@ -10,6 +10,7 @@ import 'package:shop/constants.dart';
 import 'package:shop/screens/checkout/views/cart_screen.dart';
 import 'package:shop/screens/product/views/components/product_images.dart';
 import 'package:shop/screens/product/views/components/service_info.dart';
+import 'package:shop/screens/product/views/map_screen_laundry.dart';
 import 'package:shop/screens/product/views/product_buy_now_screen.dart';
 
 // نموذج البيانات للخدمة
@@ -20,7 +21,7 @@ class ServiceModel {
   final double price;
   final double urgentPrice;
   final String image;
-
+    
   ServiceModel({
     required this.id,
     required this.name,
@@ -33,11 +34,11 @@ class ServiceModel {
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
       id: json['id'],
-      name: utf8.decode(json['name'].codeUnits),
+      name: utf8.decode(json['name'].codeUnits)+'aaaa',
       description: json['description'],
       price: double.parse(json['price']),
       urgentPrice: double.parse(json['urgent_price']),
-      image: json['image'] ?? '',  // في حال كانت الصورة غير موجودة سيتم تعيين قيمة فارغة
+      image: json['image'] ?? '', 
     );
   }
 }
@@ -48,6 +49,9 @@ class ProductDetailsScreen extends StatefulWidget {
   final String name;
   final String image;
   final String address;
+  final double latitude; // لإضافة خط العرض
+  final double longitude; // لإضافة خط الطول
+
 
   const ProductDetailsScreen({
     super.key,
@@ -56,6 +60,9 @@ class ProductDetailsScreen extends StatefulWidget {
     required this.name,
     required this.image,
     required this.address,
+    required this.latitude, // لإضافة خط العرض
+    required this.longitude, // لإضافة خط الطول
+
   });
 
   @override
@@ -221,6 +228,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         },
                         icon: SvgPicture.asset(
                           "assets/icons/Bookmark.svg",
+                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                        ),
+                      ),
+                       IconButton(
+                        onPressed: () {
+                          // الانتقال إلى شاشة الخريطة عند النقر على الزر
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                id:widget.id,
+                                latitude: widget.latitude,
+                                longitude: widget.longitude,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: SvgPicture.asset(
+                          "assets/icons/Location.svg", // تأكد من وجود أيقونة خريطة
                           color: Theme.of(context).textTheme.bodyLarge!.color,
                         ),
                       ),

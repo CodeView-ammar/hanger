@@ -49,7 +49,7 @@
         android:enableOnBackInvokedCallback="true"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="hanger_m" > <!-- Enable OnBackInvokedCallback -->
+        android:label="معلاق" > <!-- Enable OnBackInvokedCallback -->
         <activity
             android:name="com.example.hanger_m.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -75,7 +75,7 @@
             android:value="2" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDlQrdG8xZxzh1XhQQ0V3Y5rstuOoj0jdg" />
+            android:value="AIzaSyAF2Uo1kHze6N9E8xAwEcrp5Mqw0ol0ekk" />
 
         <provider
             android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
@@ -108,6 +108,10 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />
+
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
 
         <activity
             android:name="io.flutter.plugins.urllauncher.WebViewActivity"

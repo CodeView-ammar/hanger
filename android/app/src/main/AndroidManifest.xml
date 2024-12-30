@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
-        android:label="hanger_m"
+        android:label="معلاق"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"> <!-- Enable OnBackInvokedCallback -->
@@ -33,7 +33,7 @@
             android:name="flutterEmbedding"
             android:value="2"/>
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyDlQrdG8xZxzh1XhQQ0V3Y5rstuOoj0jdg"/>
+               android:value="AIzaSyAF2Uo1kHze6N9E8xAwEcrp5Mqw0ol0ekk"/>
     </application>
 
     <queries>

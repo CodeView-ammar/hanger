@@ -5,9 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/api_extintion/url_api.dart';
-import 'dart:math';
-import '../../../../constants.dart';
-import '../../../../route/route_constants.dart';
+import 'package:shop/route/route_constants.dart';
 
 class ProductModel {
   final int id;
@@ -31,7 +29,7 @@ class ProductModel {
       id: json['id'],
       name: utf8.decode(json['name'].codeUnits),
       address: utf8.decode(json['address'].codeUnits),
-      image: json['image']?.isNotEmpty == true ? json['image'] : null, // Check if image is empty or null
+      image: json['image']?.isNotEmpty == true ? json['image'] : null,
       x_latitude: json['x_map'] != "" ? double.parse(json['x_map'].toString()) : 0,
       y_longitude: json['y_map'] != "" ? double.parse(json['y_map'].toString()) : 0,
     );
@@ -39,27 +37,39 @@ class ProductModel {
 }
 
 class LocationService {
-  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-    const earthRadius = 6371;
-    double dLat = _toRadians(lat2 - lat1);
-    double dLon = _toRadians(lon2 - lon1);
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-               cos(_toRadians(lat1)) * cos(_toRadians(lat2)) *
-               sin(dLon / 2) * sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
-  }
+  Future<Map<String, dynamic>?> getDistanceAndDuration(double startLat, double startLng, double destLat, double destLng) async {
+    final apiKey = APIConfig.apiMap; // استبدل بـ API Key الخاص بك
+    final url = Uri.parse(
+      'https://maps.googleapis.com/maps/api/directions/json?origin=$startLat,$startLng&destination=$destLat,$destLng&key=$apiKey',
+    );
 
-  double _toRadians(double degree) {
-    return degree * pi / 180;
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['routes'].isNotEmpty) {
+        final distance = data['routes'][0]['legs'][0]['distance']['value'] as int; // المسافة بالمتر
+        final duration = data['routes'][0]['legs'][0]['duration']['text']; // الوقت المستغرق
+        return {
+          'distance': distance / 1000, // تحويل إلى كيلومترات
+          'duration': duration,
+        };
+      }
+    } else {
+      throw Exception('فشل تحميل المسافة والوقت');
+    }
+    
+    return null;
   }
 
   Future<Map<String, double?>> getCurrentLocation() async {
-    final location = Location();
-    var userLocation = await location.getLocation();
+final prefs = await SharedPreferences.getInstance();
+      // جلب الموقع المحفوظ في SharedPreferences
+  double? savedLatitude = prefs.getDouble('latitude');
+  double? savedLongitude = prefs.getDouble('longitude');
     return {
-      'latitude': userLocation.latitude,
-      'longitude': userLocation.longitude,
+      'latitude': savedLatitude,
+      'longitude': savedLongitude,
     };
   }
 }
@@ -90,8 +100,6 @@ class _BestSellersState extends State<BestSellers> {
 
   Future<void> _getUserLocation() async {
     var userLocation = await _locationService.getCurrentLocation();
-  
-    // تحقق مما إذا كان العنصر لا يزال موجودًا قبل استدعاء setState
     if (mounted) {
       setState(() {
         _userLatitude = userLocation['latitude'];
@@ -100,28 +108,26 @@ class _BestSellersState extends State<BestSellers> {
     }
   }
 
-  double _getDistanceToLaundry(ProductModel product) {
+  Future<Map<String, dynamic>?> _getDistanceAndDuration(ProductModel product) async {
     if (_userLatitude != null && _userLongitude != null) {
-      return _locationService.calculateDistance(
+      return await _locationService.getDistanceAndDuration(
         _userLatitude!,
         _userLongitude!,
         product.x_latitude!,
         product.y_longitude!,
       );
     } else {
-      return double.infinity;
+      return null;
     }
   }
 
   Future<List<ProductModel>> fetchProducts({int page = 1}) async {
     final response = await http.get(Uri.parse("${APIConfig.launderiesEndpoint}?page=$page"));
     if (response.statusCode == 200) {
-      // print(response.body);
-
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => ProductModel.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to fetch products');
+      throw Exception('فشل في جلب المنتجات');
     }
   }
 
@@ -136,29 +142,14 @@ class _BestSellersState extends State<BestSellers> {
         _currentPage = 1;
         _allProducts = refreshedProducts;
         _displayedProducts = _allProducts.take(10).toList();
-        _displayedProducts.sort((a, b) {
-          double distanceA = _getDistanceToLaundry(a);
-          double distanceB = _getDistanceToLaundry(b);
-          return distanceA.compareTo(distanceB);
-        });
       });
     } catch (e) {
-      print("Error refreshing products: $e");
+      print("خطأ في تحديث المنتجات: $e");
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
-  }
-
-  Future<void> _saveDistanceToStorage(double distance) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('distance', distance);
-  }
-
-  Future<double?> _getSavedDistance() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble('distance');
   }
 
   Future<void> _loadMore() async {
@@ -172,21 +163,9 @@ class _BestSellersState extends State<BestSellers> {
       setState(() {
         _currentPage++;
         _allProducts.addAll(moreProducts);
-
-        for (var product in moreProducts) {
-          if (!_displayedProducts.any((existingProduct) => existingProduct.id == product.id)) {
-            _displayedProducts.add(product);
-          }
-        }
-
-        _displayedProducts.sort((a, b) {
-          double distanceA = _getDistanceToLaundry(a);
-          double distanceB = _getDistanceToLaundry(b);
-          return distanceA.compareTo(distanceB);
-        });
       });
     } catch (e) {
-      print("Error loading more products: $e");
+      print("خطأ في تحميل المزيد من المنتجات: $e");
     } finally {
       setState(() {
         _isLoading = false;
@@ -201,9 +180,9 @@ class _BestSellersState extends State<BestSellers> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: defaultPadding / 2),
+          const SizedBox(height: 16),
           Padding(
-            padding: const EdgeInsets.all(defaultPadding),
+            padding: const EdgeInsets.all(16),
             child: Text(
               "الاقرب لكم",
               style: Theme.of(context).textTheme.titleSmall,
@@ -218,19 +197,6 @@ class _BestSellersState extends State<BestSellers> {
                 if (_currentPage == 1) {
                   _allProducts = demoBestSellersProducts;
                   _displayedProducts = _allProducts.take(10).toList();
-
-                  _getSavedDistance().then((savedDistance) {
-                    if (savedDistance == null) {
-                      final distance = _getDistanceToLaundry(demoBestSellersProducts[0]);
-                      _saveDistanceToStorage(distance);
-                    }
-                  });
-
-                  _displayedProducts.sort((a, b) {
-                    double distanceA = _getDistanceToLaundry(a);
-                    double distanceB = _getDistanceToLaundry(b);
-                    return distanceA.compareTo(distanceB);
-                  });
                 }
                 return Column(
                   children: [
@@ -249,7 +215,7 @@ class _BestSellersState extends State<BestSellers> {
                 );
               } else if (snapshot.hasError) {
                 return Center(
-                  child: Text('Error: ${snapshot.error}'),
+                  child: Text('خطأ: ${snapshot.error}'),
                 );
               } else {
                 return const Center(
@@ -259,112 +225,130 @@ class _BestSellersState extends State<BestSellers> {
             },
           ),
         ],
-       
       ),
     );
   }
-Widget _buildProductList(List<ProductModel> products) {
-  return ListView.builder(
-    physics: const NeverScrollableScrollPhysics(),
-    shrinkWrap: true,
-    itemCount: products.length,
-    itemBuilder: (context, index) {
-      // Use the image from the product if available, else use the default image
-    String imageUrl = products[index].image ?? '${APIConfig.static_baseUrl}/images/store.jpg';
 
-      return Padding(
-        padding: const EdgeInsets.only(
-          left: defaultPadding,
-          right: defaultPadding,
-          bottom: defaultPadding,
-        ),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              productDetailsScreenRoute,
-              arguments: {
-                "isAvailable": index.isEven,
-                "id": products[index].id,
-                "name": products[index].name,
-                "image": products[index].image,
-                "address": products[index].address,
-              },
-            );
-          },
-          child: Container(
-            height: 80,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 17, 52, 92),
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRect(
-                    child: Image.network(
-                      imageUrl,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        } else {
-                          return const CircularProgressIndicator();
-                        }
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        // Fallback to local image if network image fails
-                        return Image.asset(
-                          'assets/images/store.jpg', // Your local default image
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        );
-                      },
+  Widget _buildProductList(List<ProductModel> products) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        String imageUrl = products[index].image ?? '${APIConfig.static_baseUrl}/images/store.jpg';
+
+        return Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 16,
+          ),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                productDetailsScreenRoute,
+                arguments: {
+                  "isAvailable": index.isEven,
+                  "id": products[index].id,
+                  "name": products[index].name,
+                  "image": products[index].image,
+                  "address": products[index].address,
+                  "latitude": products[index].x_latitude,
+                  "longitude": products[index].y_longitude,
+
+
+                },
+              );
+            },
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 17, 52, 92),
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRect(
+                      child: Image.network(
+                        imageUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/store.jpg',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          products[index].name,
-                          style: const TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/Location.svg",
-                              height: 20,
-                              colorFilter: const ColorFilter.mode(
-                                Colors.white,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              '${_getDistanceToLaundry(products[index]).toStringAsFixed(2)} كم',
-                              style: const TextStyle(fontSize: 14, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            products[index].name,
+                            style: const TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          const SizedBox(height: 5),
+                          FutureBuilder<Map<String, dynamic>?>(
+                            future: _getDistanceAndDuration(products[index]),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (snapshot.hasData) {
+                                final distance = snapshot.data!['distance'];
+                                final duration = snapshot.data!['duration'];
+                                return Row(
+                                  children: [
+                                    SvgPicture.asset(
+                                      "assets/icons/Location.svg",
+                                      height: 20,
+                                      colorFilter: const ColorFilter.mode(
+                                        Colors.white,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      '${distance!.toStringAsFixed(2)} كم - $duration',
+                                      style: const TextStyle(fontSize: 14, color: Colors.white),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return Text(
+                                  'غير متوفر',
+                                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }

@@ -1,7 +1,6 @@
 name: shop
 description: FlutterShop is a premium E-commerce UI kit that you can use to build various e-commerce apps using Flutter that works on both Android & iOS. This kit contains 100+ nicely crafted minimal screens that cover everything you need for your shop app.
-
-publish_to: "none"
+publish_to: "ammar abudal wadood"
 
 version: 1.0.0+1
 
@@ -33,7 +32,12 @@ dependencies:
   provider: ^6.1.2
   moyasar: ^2.0.2
   easy_stepper: ^0.8.3
- 
+  geideapay:
+    git:
+      url: https://github.com/GeideaSolutions/Flutter-SDK
+      ref: main # branch name
+  
+  
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +56,6 @@ flutter:
     - assets/logo/
     - assets/screens/
     - assets/product/
-    
 
   fonts:
     - family: Plus Jakarta
@@ -73,3 +76,6 @@ flutter:
           weight: 700
         - asset: assets/fonts/grandis_extended/GrandisExtended-Black.ttf
           weight: 900
+
+dependency_overrides:
+  intl: 0.19.0  # تحديد إصدار متوافق لحل تعارض الإصدارات

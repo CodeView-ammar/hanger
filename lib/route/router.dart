@@ -139,6 +139,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     String name = args?["name"] ?? "";
     String image = args?["image"] ?? "";
     String address = args?["address"] ?? "";
+    double latitude=args?["latitude"]??0.0; // لإضافة خط العرض
+    double longitude=args?["longitude"]??0.0; // لإضافة خط الطول
 
     return ProductDetailsScreen(
       id: id,
@@ -146,6 +148,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       name: name,
       image: image,
       address: address,
+      latitude:latitude,
+      longitude:longitude,
     );
   },
 );
