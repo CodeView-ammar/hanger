@@ -19,6 +19,8 @@ class ProductBuyNowScreen extends StatefulWidget {
   final int quantity;
   final int laundry;
   final int serviceId;
+  final double distance; // إضافة المسافة
+  final String duration; // إضافة الوقت
 
   const ProductBuyNowScreen({
     super.key,
@@ -29,6 +31,8 @@ class ProductBuyNowScreen extends StatefulWidget {
     required this.quantity,
     required this.laundry,
     required this.serviceId,
+    required this.distance,
+    required this.duration,
   });
 
   @override

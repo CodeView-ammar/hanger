@@ -8,6 +8,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "archive",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.6.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "args",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/args-2.6.0",
       "packageUri": "lib/",
@@ -75,15 +81,21 @@
     },
     {
       "name": "csslib",
-      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/csslib-1.0.2",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/csslib-0.17.3",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.19"
     },
     {
       "name": "cupertino_icons",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/cupertino_icons-1.0.8",
       "packageUri": "lib/",
       "languageVersion": "3.1"
+    },
+    {
+      "name": "easy_stepper",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/easy_stepper-0.8.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.16"
     },
     {
       "name": "fake_async",
@@ -206,6 +218,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "geideapay",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/git/Flutter-SDK-4d6d09ff980b06e22a016e261c9e664fd2791b55/",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
       "name": "geocoding",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/geocoding-3.0.0",
       "packageUri": "lib/",
@@ -303,9 +321,9 @@
     },
     {
       "name": "html",
-      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.5",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/html-0.15.4",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "2.19"
     },
     {
       "name": "http",
@@ -428,6 +446,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "lottie",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/lottie-2.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
@@ -450,6 +474,18 @@
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/mime-2.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "moyasar",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/moyasar-2.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "nested",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/nested-1.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "octo_image",
@@ -506,6 +542,30 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pay",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/pay-1.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "pay_android",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/pay_android-1.0.11",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "pay_ios",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/pay_ios-1.0.11",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "pay_platform_interface",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/pay_platform_interface-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
       "name": "permission_handler",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/permission_handler-11.3.1",
       "packageUri": "lib/",
@@ -548,6 +608,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pin_input_text_field",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/pin_input_text_field-4.5.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.13"
+    },
+    {
       "name": "platform",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/platform-3.1.6",
       "packageUri": "lib/",
@@ -558,6 +624,12 @@
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/plugin_platform_interface-2.1.8",
       "packageUri": "lib/",
       "languageVersion": "3.0"
+    },
+    {
+      "name": "provider",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/provider-6.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "rxdart",
@@ -618,6 +690,12 @@
       "rootUri": "file:///C:/flutter/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.2"
+    },
+    {
+      "name": "sms_autofill",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/sms_autofill-2.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "source_span",
@@ -800,6 +878,30 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "webview_flutter",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter-4.10.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "webview_flutter_android",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_android-4.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
+      "name": "webview_flutter_platform_interface",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_platform_interface-2.10.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
+    },
+    {
+      "name": "webview_flutter_wkwebview",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/webview_flutter_wkwebview-3.16.3",
+      "packageUri": "lib/",
+      "languageVersion": "3.5"
+    },
+    {
       "name": "xdg_directories",
       "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/xdg_directories-1.1.0",
       "packageUri": "lib/",
@@ -812,13 +914,19 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "yaml",
+      "rootUri": "file:///C:/Users/Power%20Plus/AppData/Local/Pub/Cache/hosted/pub.dev/yaml-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
       "name": "shop",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-12-03T21:41:43.881121Z",
+  "generated": "2024-12-30T21:41:34.307717Z",
   "generator": "pub",
   "generatorVersion": "3.5.3",
   "flutterRoot": "file:///C:/flutter",

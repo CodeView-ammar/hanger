@@ -244,7 +244,26 @@ class _BestSellersState extends State<BestSellers> {
             bottom: 16,
           ),
           child: GestureDetector(
-            onTap: () {
+            onTap: () async {
+  final distanceData = await _getDistanceAndDuration(products[index]);
+  if (distanceData != null) {
+    Navigator.pushNamed(
+      context,
+      productDetailsScreenRoute,
+                arguments: {
+                  "isAvailable": index.isEven,
+                  "id": products[index].id,
+                  "name": products[index].name,
+                  "image": products[index].image,
+                  "address": products[index].address,
+                  "latitude": products[index].x_latitude,
+                  "longitude": products[index].y_longitude,
+                  "distance": distanceData['distance'], // إضافة المسافة
+                  "duration": distanceData['duration'], // إضافة الوقت
+                },
+              );
+            } else {
+              // معالجة الحالة عندما تكون بيانات المسافة غير متاحة
               Navigator.pushNamed(
                 context,
                 productDetailsScreenRoute,
@@ -256,11 +275,12 @@ class _BestSellersState extends State<BestSellers> {
                   "address": products[index].address,
                   "latitude": products[index].x_latitude,
                   "longitude": products[index].y_longitude,
-
-
+                  "distance": null,
+                  "duration": null,
                 },
               );
-            },
+            }
+          },
             child: Container(
               height: 80,
               decoration: BoxDecoration(

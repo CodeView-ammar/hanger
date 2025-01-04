@@ -36,6 +36,7 @@ dependencies:
     git:
       url: https://github.com/GeideaSolutions/Flutter-SDK
       ref: main # branch name
+  sms_autofill: ^2.4.1
   
   
 

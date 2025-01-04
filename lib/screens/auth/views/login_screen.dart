@@ -3,7 +3,6 @@ import 'package:shop/components/api_extintion/otp_api.dart';
 import 'package:shop/constants.dart';
 import 'package:shop/screens/auth/views/otp_screen.dart';
 import 'package:shop/screens/auth/views/privacy_policy.dart'; // استيراد شاشة سياسة الخصوصية
-
 import 'components/login_form.dart';
 
 class LoginScreen extends StatefulWidget {

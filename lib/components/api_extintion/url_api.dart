@@ -4,6 +4,8 @@ class APIConfig {
  
   static const String static_baseUrl='$_baseUrl/static';
 
+
+
   static String get launderiesEndpoint => '$api_baseUrl/laundries/';
   static String get bannerEndpoint => '$api_baseUrl/slide-show/';
   static String get userEndpoint => '$api_baseUrl/users/register/';
@@ -27,6 +29,7 @@ class APIConfig {
   static String get orderdetilsUrl => '$api_baseUrl/orders-detils/';
   static String get orderitemget_order_itemsUrl => '$api_baseUrl/orders-items/get_order_items/';
   static String get orderStatusEdit => '$api_baseUrl/order';
+  static String get deliverysettingEndpoint => '$api_baseUrl/delivery-setting/';
  
  
   static String get apiMap=>'AIzaSyAF2Uo1kHze6N9E8xAwEcrp5Mqw0ol0ekk';

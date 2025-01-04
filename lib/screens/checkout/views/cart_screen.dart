@@ -214,14 +214,18 @@ void removeItem(int index) {
     totalPrice = cartItems.fold(0.0, (sum, item) => sum + double.parse(item['price']) * item['quantity']);
   });
 }
-
-  // دالة تحميل البيانات عند تغيير التبعيات
+double distance = 0.0; // متغير للمسافة
+  String duration = ""; // متغير للمدة
+  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-    final int laundryId = args != null ? args as int : 0;
-
+    
+    // استرداد المتغيرات من RouteSettings
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final int laundryId = args?['id'] ?? 0;
+    distance = args?['distance'] ?? 0.0; // استرداد المسافة
+    duration = args?['duration'] ?? ""; // استرداد المدة
     if (laundryId > 0) {
       fetchCartData(laundryId);
     }
@@ -292,7 +296,7 @@ void removeItem(int index) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReviewOrderScreen(laundryId: laundryId,total:totalPrice,isPaid: false),
+                          builder: (context) => ReviewOrderScreen(laundryId: laundryId,total:totalPrice,isPaid: false,distance: distance,duration: duration),
                         ),
                       );
                     } else {

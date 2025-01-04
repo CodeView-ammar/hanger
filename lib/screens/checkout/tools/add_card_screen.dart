@@ -43,6 +43,8 @@ class _AddCardScreenState extends State<AddCardScreen> {
                 laundryId: widget.laundryId,
                 total: widget.total,
                 isPaid: true,
+                distance: 0,
+                duration: '',
               ),
             ),
           );

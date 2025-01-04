@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.hanger_m.app-mergeDebugResources-31:/values-mn/values-mn.xml",
+            "outputFile": "com.example.hanger_m.app-mergeDebugResources-32:/values-mn/values-mn.xml",
             "map": [
                 {
                     "source": "C:\\Users\\Power Plus\\.gradle\\caches\\transforms-3\\96004e15647bc525170b7742251f128d\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-mn\\values.xml",
@@ -35,6 +35,23 @@
                         "startOffsets": "55,153,255,356,454,559,671,3427",
                         "endColumns": "97,101,100,97,104,111,118,100",
                         "endOffsets": "148,250,351,449,554,666,785,3523"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Power Plus\\.gradle\\caches\\transforms-3\\877c10d9ac73d920f0746154de229814\\transformed\\jetified-play-services-wallet-19.1.0\\res\\values-mn\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "202",
+                        "endColumns": "77",
+                        "endOffsets": "279"
+                    },
+                    "to": {
+                        "startLines": "32",
+                        "startColumns": "4",
+                        "startOffsets": "3528",
+                        "endColumns": "81",
+                        "endOffsets": "3605"
                     }
                 },
                 {

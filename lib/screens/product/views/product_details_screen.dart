@@ -51,7 +51,8 @@ class ProductDetailsScreen extends StatefulWidget {
   final String address;
   final double latitude; // لإضافة خط العرض
   final double longitude; // لإضافة خط الطول
-
+  final double distance;  // تمرير المسافة
+  final String duration; // تمرير الوقت
 
   const ProductDetailsScreen({
     super.key,
@@ -62,7 +63,8 @@ class ProductDetailsScreen extends StatefulWidget {
     required this.address,
     required this.latitude, // لإضافة خط العرض
     required this.longitude, // لإضافة خط الطول
-
+    required this.distance,
+    required this.duration,
   });
 
   @override
@@ -127,6 +129,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         serviceImage: service.image,
         quantity: quantity,
         laundry: widget.id,
+        distance: widget.distance,  // تمرير المسافة
+        duration: widget.duration, 
       ),
     );
 
@@ -192,7 +196,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               MaterialPageRoute(
                 builder: (context) => CartScreen(),
                 settings: RouteSettings(
-                  arguments: widget.id,  // تمرير الـ id هنا
+                  arguments:{
+                      'id': widget.id,  // تمرير الـ id هنا
+                      'distance': widget.distance, // تمرير المسافة
+                      'duration': widget.duration, // تمرير الوقت
+                    },
+                
                 ),
               ),
             );
@@ -257,6 +266,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       widget.image.isEmpty ? '${APIConfig.static_baseUrl}/images/store.jpg' : widget.image, // إذا كانت الصورة فارغة، استخدم الصورة الافتراضية
                     ],
                   ),
+                  SliverPadding(
+                    padding: const EdgeInsets.all(defaultPadding),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        widget.distance.toString()+"كم"+" - "+widget.duration.toString()+"دقيقة",
+                        style: Theme.of(context).textTheme.titleSmall!,
+                      ),
+                    ),
+                  ),
                   ServiceInfo(
                     brand: widget.address,
                     title: widget.name,
@@ -265,6 +283,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     rating: 4.3,
                     numOfReviews: 126,
                   ),
+                  
+                  
                   SliverPadding(
                     padding: const EdgeInsets.all(defaultPadding),
                     sliver: SliverToBoxAdapter(

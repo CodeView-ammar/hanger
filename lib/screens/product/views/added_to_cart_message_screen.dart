@@ -54,7 +54,7 @@ class AddedToCartMessageScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ReviewOrderScreen(laundryId: validLaundryId,total: 0.00,isPaid: false),
+                      builder: (context) => ReviewOrderScreen(laundryId: validLaundryId,total: 0.00,isPaid: false,distance: 0,duration: ''),
                     ),
                   );
                 },

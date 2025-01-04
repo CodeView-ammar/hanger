@@ -13,7 +13,10 @@ class ReviewOrderScreen extends StatefulWidget {
   final int laundryId;
   final double total;
   final bool isPaid;
-  const ReviewOrderScreen({Key? key, required this.laundryId, required this.total,required this.isPaid}) : super(key: key);
+  final double distance;
+  final String duration;
+  const ReviewOrderScreen({Key? key, required this.laundryId, required this.total,required this.isPaid, required this.distance,
+   required this.duration}) : super(key: key);
 
   @override
   _ReviewOrderScreenState createState() => _ReviewOrderScreenState();
@@ -29,7 +32,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
   LatLng userLocationMarker = LatLng(0.0, 0.0);
   String selectedPayment = 'عادي'; // default value
   String? defaultPaymentMethod; // Store default payment method
-
+  String? price_per_kg;
   @override
   void dispose() {
     mapController.dispose();
@@ -42,8 +45,35 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
     _loadCustomMarker(); // Load custom marker image
     fetchAddress();
     fetchDefaultPaymentMethod();
+ fetchPricePerKg().then((price) {
+    if (price != null) {
+      setState(() {
+        price_per_kg = price; // تأكد من أن price_per_kg هو من نوع double
+      });
+    } else {
+      print('لم يتم جلب السعر.');
+    }
+  });
   }
+Future<String?> fetchPricePerKg() async {
+  final response = await http.get(Uri.parse(APIConfig.deliverysettingEndpoint));
 
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    // تأكد من أن price_per_kg يتم تخزينه كـ double
+    print(data[0]);
+    return data[0]['price_per_kg'];
+  } else {
+    print('فشل في جلب السعر: ${response.statusCode}');
+    return null; // يمكنك إرجاع null عند الفشل
+  }
+}
+double get totalAmount {
+  double deliveryPrice = (price_per_kg != null && widget.distance != null) 
+      ? (double.tryParse(price_per_kg!)! * widget.distance) 
+      : 0.0;
+  return (widget.total + deliveryPrice);
+}
   Future<void> fetchDefaultPaymentMethod() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');
@@ -55,6 +85,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
       body: json.encode({
         'user': userId,
       }),
+      
     );
 
     if (response.statusCode == 200) {
@@ -206,16 +237,20 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 240, 237, 237),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Center(
-                  child: TimeIndicator(time: '30 - 40'),
-                ),
-              ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 240, 237, 237),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: TimeIndicator(
+                        time: widget.duration.split("mins")[0] + '-' +
+                              (int.tryParse(widget.duration.split("mins")[0])! + 10).toString(),
+                      ),
+                    ),
+                  ),
+
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -368,6 +403,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                   ],
                 ),
               ),
+             
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -399,7 +435,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                               MaterialPageRoute(
                                 builder: (context) => AddCardDetailsScreen(),
                                 settings: RouteSettings(
-                                  arguments:[ widget.total,widget.laundryId]  // تمرير المبلغ الإجمالي
+                                  arguments:[ double.tryParse(totalAmount.toStringAsFixed(2)),widget.laundryId]  // تمرير المبلغ الإجمالي
                                   
                                 ),
                               ),
@@ -434,7 +470,60 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green[100],
-                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(0),   // الزاوية العليا اليسرى
+                      bottomRight: Radius.circular(0),  // الزاوية العليا اليمنى
+                      topLeft: Radius.circular(8), // الزاوية السفلى اليسرى
+                      topRight: Radius.circular(8), // الزاوية السفلى اليسرى
+                    ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'اجمالي الطلب',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      '${widget.total} ريال',
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ),
+                
+              ),
+              
+             Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green[100],
+                borderRadius: BorderRadius.circular(0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'سعر التوصيل',
+                    style: TextStyle(fontSize: 10),
+                  ),
+                  Text(
+                    '${(price_per_kg != null && widget.distance != null) ? (double.tryParse(price_per_kg!)! * widget.distance).toStringAsFixed(2) : '0.00'} ريال',
+                    style: const TextStyle(fontSize: 10),
+                  ),
+                ],
+              ),
+            ),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(0),   // الزاوية العليا اليسرى
+                      topRight: Radius.circular(0),  // الزاوية العليا اليمنى
+                      bottomLeft: Radius.circular(8), // الزاوية السفلى اليسرى
+                      bottomRight: Radius.circular(8), // الزاوية السفلى اليسرى
+                    ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -444,7 +533,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '${widget.total} ريال',
+                      '${totalAmount.toStringAsFixed(2)} ريال',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ],

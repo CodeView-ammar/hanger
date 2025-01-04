@@ -12,8 +12,13 @@ attr alpha
 attr alwaysExpand
 attr ambientEnabled
 attr animationBackgroundColor
+attr appTheme
 attr backgroundColor
 attr buttonSize
+attr buyButtonAppearance
+attr buyButtonHeight
+attr buyButtonText
+attr buyButtonWidth
 attr cameraBearing
 attr cameraMaxZoomPreference
 attr cameraMinZoomPreference
@@ -24,6 +29,8 @@ attr cameraZoom
 attr circleCrop
 attr clearTop
 attr colorScheme
+attr customThemeStyle
+attr environment
 attr finishPrimaryWithPlaceholder
 attr finishPrimaryWithSecondary
 attr finishSecondaryWithPrimary
@@ -38,6 +45,8 @@ attr fontProviderSystemFontFamily
 attr fontStyle
 attr fontVariationSettings
 attr fontWeight
+attr fragmentMode
+attr fragmentStyle
 attr imageAspectRatio
 attr imageAspectRatioAdjust
 attr lStar
@@ -48,6 +57,13 @@ attr latLngBoundsSouthWestLongitude
 attr liteMode
 attr mapId
 attr mapType
+attr maskedWalletDetailsBackground
+attr maskedWalletDetailsButtonBackground
+attr maskedWalletDetailsButtonTextAppearance
+attr maskedWalletDetailsHeaderTextAppearance
+attr maskedWalletDetailsLogoImageType
+attr maskedWalletDetailsLogoTextColor
+attr maskedWalletDetailsTextAppearance
 attr nestedScrollViewStyle
 attr placeholderActivityName
 attr primaryActivityName
@@ -65,6 +81,7 @@ attr splitMinWidthDp
 attr splitRatio
 attr stickyPlaceholder
 attr tag
+attr toolbarTextColorStyle
 attr ttcIndex
 attr uiCompass
 attr uiMapToolbar
@@ -75,6 +92,7 @@ attr uiTiltGestures
 attr uiZoomControls
 attr uiZoomGestures
 attr useViewLifecycle
+attr windowTransitionStyle
 attr zOrderOnTop
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
@@ -97,6 +115,19 @@ color common_google_signin_btn_text_light_pressed
 color common_google_signin_btn_tint
 color notification_action_color_filter
 color notification_icon_bg_color
+color wallet_bright_foreground_disabled_holo_light
+color wallet_bright_foreground_holo_dark
+color wallet_bright_foreground_holo_light
+color wallet_dim_foreground_disabled_holo_dark
+color wallet_dim_foreground_holo_dark
+color wallet_highlighted_text_holo_dark
+color wallet_highlighted_text_holo_light
+color wallet_hint_foreground_holo_dark
+color wallet_hint_foreground_holo_light
+color wallet_holo_blue_light
+color wallet_link_text_light
+color wallet_primary_text_holo_light
+color wallet_secondary_text_holo_dark
 dimen browser_actions_context_menu_max_width
 dimen browser_actions_context_menu_min_padding
 dimen compat_button_inset_horizontal_material
@@ -210,23 +241,42 @@ id always
 id alwaysAllow
 id alwaysDisallow
 id amu_text
+id android_pay
+id android_pay_dark
+id android_pay_light
+id android_pay_light_with_border
 id androidx_window_activity_scope
 id async
 id auto
 id blocking
+id book_now
 id bottomToTop
 id browser_actions_header_text
 id browser_actions_menu_item_icon
 id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
+id buyButton
+id buy_now
+id buy_with
+id buy_with_google
 id chronometer
+id classic
 id dark
 id dialog_button
+id donate_with
+id donate_with_google
 id edit_text_id
 id forever
 id fragment_container_view_tag
+id googleMaterial2
+id google_wallet_classic
+id google_wallet_grayscale
+id google_wallet_monochrome
+id grayscale
 id hide_ime_id
+id holo_dark
+id holo_light
 id hybrid
 id icon
 id icon_group
@@ -237,20 +287,29 @@ id light
 id line1
 id line3
 id locale
+id logo_only
 id ltr
+id match_parent
+id material
+id monochrome
 id never
 id none
 id normal
 id notification_background
 id notification_main_column
 id notification_main_column_container
+id production
 id report_drawn
 id right_icon
 id right_side
 id rtl
+id sandbox
 id satellite
+id selectionDetails
+id slide
 id special_effects_controller_view_tag
 id standard
+id strict_sandbox
 id tag_accessibility_actions
 id tag_accessibility_clickable_spans
 id tag_accessibility_heading
@@ -265,6 +324,7 @@ id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
 id tag_window_insets_animation_callback
 id terrain
+id test
 id text
 id text2
 id time
@@ -278,6 +338,7 @@ id visible_removing_fragment_view_tag
 id webview
 id wide
 id window
+id wrap_content
 integer google_play_services_version
 integer status_bar_notification_info_maxnum
 layout amu_info_window
@@ -294,6 +355,7 @@ layout notification_template_custom_big
 layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
+layout wallet_test_layout
 mipmap ic_launcher
 string androidx_startup
 string call_notification_answer_action
@@ -326,6 +388,7 @@ string fallback_menu_item_copy_link
 string fallback_menu_item_open_in_browser
 string fallback_menu_item_share_link
 string status_bar_notification_info_overflow
+string wallet_buy_button_place_holder
 style LaunchTheme
 style NormalTheme
 style TextAppearance_Compat_Notification
@@ -333,6 +396,10 @@ style TextAppearance_Compat_Notification_Info
 style TextAppearance_Compat_Notification_Line2
 style TextAppearance_Compat_Notification_Time
 style TextAppearance_Compat_Notification_Title
+style WalletFragmentDefaultButtonTextAppearance
+style WalletFragmentDefaultDetailsHeaderTextAppearance
+style WalletFragmentDefaultDetailsTextAppearance
+style WalletFragmentDefaultStyle
 style Widget_Compat_NotificationActionContainer
 style Widget_Compat_NotificationActionText
 style amu_Bubble_TextAppearance_Dark
@@ -342,6 +409,7 @@ styleable ActivityFilter activityAction activityName
 styleable ActivityRule alwaysExpand tag
 styleable Capability queryPatterns shortcutMatchRequired
 styleable ColorStateListItem android_color android_alpha android_lStar alpha lStar
+styleable CustomWalletTheme customThemeStyle toolbarTextColorStyle windowTransitionStyle
 styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
 styleable FontFamilyFont android_font android_fontWeight android_fontStyle android_ttcIndex android_fontVariationSettings font fontStyle fontVariationSettings fontWeight ttcIndex
 styleable Fragment android_name android_id android_tag
@@ -354,5 +422,7 @@ styleable SignInButton buttonSize colorScheme scopeUris
 styleable SplitPairFilter primaryActivityName secondaryActivityAction secondaryActivityName
 styleable SplitPairRule animationBackgroundColor clearTop finishPrimaryWithSecondary finishSecondaryWithPrimary splitLayoutDirection splitMaxAspectRatioInLandscape splitMaxAspectRatioInPortrait splitMinHeightDp splitMinSmallestWidthDp splitMinWidthDp splitRatio tag
 styleable SplitPlaceholderRule animationBackgroundColor finishPrimaryWithPlaceholder placeholderActivityName splitLayoutDirection splitMaxAspectRatioInLandscape splitMaxAspectRatioInPortrait splitMinHeightDp splitMinSmallestWidthDp splitMinWidthDp splitRatio stickyPlaceholder tag
+styleable WalletFragmentOptions appTheme environment fragmentMode fragmentStyle
+styleable WalletFragmentStyle buyButtonAppearance buyButtonHeight buyButtonText buyButtonWidth maskedWalletDetailsBackground maskedWalletDetailsButtonBackground maskedWalletDetailsButtonTextAppearance maskedWalletDetailsHeaderTextAppearance maskedWalletDetailsLogoImageType maskedWalletDetailsLogoTextColor maskedWalletDetailsTextAppearance
 xml flutter_image_picker_file_paths
 xml image_share_filepaths

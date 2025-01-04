@@ -77,6 +77,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => const LoginScreen(),
       );
+      // return MaterialPageRoute(
+      //   builder: (context) => Otp(),
+      // );
     case signUpScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const SignUpScreen(),
@@ -130,29 +133,34 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     //     builder: (context) => const SetupFaceIdScreen(),
     //   );
     
-    case productDetailsScreenRoute:
+ case productDetailsScreenRoute:
   return MaterialPageRoute(
-  builder: (context) {
-    final args = settings.arguments as Map<String, dynamic>?;
-    bool isAvailable = args?["isAvailable"] ?? true; // Default to true if not provided
-    int id = args?["id"] ?? 0; // Default to 0 if not provided
-    String name = args?["name"] ?? "";
-    String image = args?["image"] ?? "";
-    String address = args?["address"] ?? "";
-    double latitude=args?["latitude"]??0.0; // لإضافة خط العرض
-    double longitude=args?["longitude"]??0.0; // لإضافة خط الطول
+    builder: (context) {
+      final args = settings.arguments as Map<String, dynamic>?;
+     
+      bool isAvailable = args?["isAvailable"] ?? true; // الافتراضي إلى true إذا لم يتم توفيره
+      int id = args?["id"] ?? 0; // الافتراضي إلى 0 إذا لم يتم توفيره
+      String name = args?["name"] ?? "";
+      String image = args?["image"] ?? "";
+      String address = args?["address"] ?? "";
+      double latitude = args?["latitude"] ?? 0.0; // لإضافة خط العرض
+      double longitude = args?["longitude"] ?? 0.0; // لإضافة خط الطول
+      double distance = args?["distance"] ?? 0.0; // إضافة المسافة
+      String duration = args?["duration"]?? '0 mins'; // إضافة الوقت
 
-    return ProductDetailsScreen(
-      id: id,
-      isAvailable: isAvailable,
-      name: name,
-      image: image,
-      address: address,
-      latitude:latitude,
-      longitude:longitude,
-    );
-  },
-);
+      return ProductDetailsScreen(
+        id: id,
+        isAvailable: isAvailable,
+        name: name,
+        image: image,
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        distance: distance, // تمرير المسافة
+        duration: duration, // تمرير الوقت
+      );
+    },
+  );
 case productReviewsScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const ProductReviewsScreen(),
