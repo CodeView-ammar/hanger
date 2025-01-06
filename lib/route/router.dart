@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop/entry_point.dart';
+import 'package:shop/screens/help/views/instructions_screen.dart';
 import 'package:shop/screens/user_info/views/edit_user_info_screen.dart';
 
 import 'screen_export.dart';
@@ -84,10 +85,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => const SignUpScreen(),
       );
-    // case profileSetupScreenRoute:
-    //   return MaterialPageRoute(
-    //     builder: (context) => const ProfileSetupScreen(),
-    //   );
+    case instructionsScreenRoute:
+      return MaterialPageRoute(
+        builder: (context) => const InstructionsScreen(),
+      );
     case passwordRecoveryScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const PasswordRecoveryScreen(),
@@ -193,10 +194,7 @@ case productReviewsScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const OnSaleScreen(),
       );
-    case kidsScreenRoute:
-      return MaterialPageRoute(
-        builder: (context) => const KidsScreen(),
-      );
+
     case searchScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const SearchScreen(),
@@ -217,10 +215,10 @@ case productReviewsScreenRoute:
       return MaterialPageRoute(
         builder: (context) => const ProfileScreen(),
       );
-    // case getHelpScreenRoute:
-    //   return MaterialPageRoute(
-    //     builder: (context) => const GetHelpScreen(),
-    //   );
+    case getHelpScreenRoute:
+      return MaterialPageRoute(
+        builder: (context) => const HelpScreen(),
+      );
     // case chatScreenRoute:
     //   return MaterialPageRoute(
     //     builder: (context) => const ChatScreen(),

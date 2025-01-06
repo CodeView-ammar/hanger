@@ -61,16 +61,16 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.pushNamed(context, ordersScreenRoute);
                   },
                 ),
-                ProfileMenuListTile(
-                  text: "المرتجعات",
-                  svgSrc: "assets/icons/Return.svg",
-                  press: () {},
-                ),
-                ProfileMenuListTile(
-                  text: "قائمة الرغبات",
-                  svgSrc: "assets/icons/Wishlist.svg",
-                  press: () {},
-                ),
+                // ProfileMenuListTile(
+                //   text: "المرتجعات",
+                //   svgSrc: "assets/icons/Return.svg",
+                //   press: () {},
+                // ),
+                // ProfileMenuListTile(
+                //   text: "قائمة الرغبات",
+                //   svgSrc: "assets/icons/Wishlist.svg",
+                //   press: () {},
+                // ),
                 ProfileMenuListTile(
                   text: "العناوين",
                   svgSrc: "assets/icons/Address.svg",
@@ -78,13 +78,13 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.pushNamed(context, addressesScreenRoute);
                   },
                 ),
-                ProfileMenuListTile(
-                  text: "قسط",
-                  svgSrc: "assets/icons/card.svg",
-                  press: () {
-                    Navigator.pushNamed(context, emptyPaymentScreenRoute);
-                  },
-                ),
+                // ProfileMenuListTile(
+                //   text: "قسط",
+                //   svgSrc: "assets/icons/card.svg",
+                //   press: () {
+                //     Navigator.pushNamed(context, emptyPaymentScreenRoute);
+                //   },
+                // ),
                 ProfileMenuListTile(
                   text: "محفظة",
                   svgSrc: "assets/icons/Wallet.svg",
@@ -109,13 +109,13 @@ class ProfileScreen extends StatelessWidget {
                     Navigator.pushNamed(context, enableNotificationScreenRoute);
                   },
                 ),
-                ProfileMenuListTile(
-                  text: "التفضيلات",
-                  svgSrc: "assets/icons/Preferences.svg",
-                  press: () {
-                    Navigator.pushNamed(context, preferencesScreenRoute);
-                  },
-                ),
+                // ProfileMenuListTile(
+                //   text: "التفضيلات",
+                //   svgSrc: "assets/icons/Preferences.svg",
+                //   press: () {
+                //     Navigator.pushNamed(context, preferencesScreenRoute);
+                //   },
+                // ),
                 const SizedBox(height: defaultPadding),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -125,13 +125,13 @@ class ProfileScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
-                ProfileMenuListTile(
-                  text: "لغة",
-                  svgSrc: "assets/icons/Language.svg",
-                  press: () {
-                    Navigator.pushNamed(context, selectLanguageScreenRoute);
-                  },
-                ),
+                // ProfileMenuListTile(
+                //   text: "لغة",
+                //   svgSrc: "assets/icons/Language.svg",
+                //   press: () {
+                //     Navigator.pushNamed(context, selectLanguageScreenRoute);
+                //   },
+                // ),
                 ProfileMenuListTile(
                   text: "موقع",
                   svgSrc: "assets/icons/Location.svg",
@@ -156,7 +156,10 @@ class ProfileScreen extends StatelessWidget {
                 ProfileMenuListTile(
                   text: "التعليمات",
                   svgSrc: "assets/icons/FAQ.svg",
-                  press: () {},
+                  press: () {
+                    Navigator.pushNamed(context, instructionsScreenRoute);
+
+                  },
                   isShowDivider: false,
                 ),
                 const SizedBox(height: defaultPadding),
