@@ -102,7 +102,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         });
       }
     } else {
-      throw Exception('فشل في جلب total_price');
+      totalPrice=0.0;
     }
   }
 

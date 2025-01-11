@@ -19,12 +19,13 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   List<Map<String, String>> orders = [];
   bool isLoading = true;
+  bool isLoggedIn = false; // التحقق من تسجيل الدخول
   Timer? _timer;  // متغير الـ Timer
 
   @override
   void initState() {
     super.initState();
-    fetchOrders();  // جلب الطلبات عند بدء الشاشة
+    checkLoginStatus(); // التحقق من حالة تسجيل الدخول عند بدء الشاشة
     _startPeriodicUpdate();  // بدأ التحديث الدوري للبيانات
   }
 
@@ -57,7 +58,11 @@ class _OrderScreenState extends State<OrderScreen> {
     String? userid = prefs.getString('userid');
 
     if (userid == null) {
-      Navigator.pushNamed(context, logInScreenRoute);
+      // إذا لم يكن المستخدم مسجل دخول، نعرض رسالة و زر تسجيل الدخول
+      setState(() {
+        isLoggedIn = false;
+        isLoading = false;
+      });
       return;
     }
 
@@ -68,6 +73,7 @@ class _OrderScreenState extends State<OrderScreen> {
         final List<dynamic> data = jsonDecode(response.body);  // تحويل البيانات إلى قائمة
         setState(() {
           isLoading = false;
+          isLoggedIn = true;
           orders = data.map<Map<String, String>>((order) {
             return {
               'id':order['id'].toString(),
@@ -89,6 +95,24 @@ class _OrderScreenState extends State<OrderScreen> {
       print('حدث خطأ: $e');
       setState(() {
         isLoading = false;
+      });
+    }
+  }
+
+  // دالة للتحقق من حالة تسجيل الدخول
+  Future<void> checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userid = prefs.getString('userid');
+    
+    if (userid != null) {
+      setState(() {
+        isLoggedIn = true; // المستخدم مسجل دخول
+        fetchOrders(); // جلب الطلبات إذا كان مسجلًا دخول
+      });
+    } else {
+      setState(() {
+        isLoggedIn = false; // المستخدم غير مسجل دخول
+        isLoading = false; // إيقاف التحميل
       });
     }
   }
@@ -183,78 +207,93 @@ class _OrderScreenState extends State<OrderScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-                Expanded(
-              child: RefreshIndicator(
-                onRefresh: fetchOrders,  // سيتم استدعاء هذه الدالة عند السحب إلى الأسفل
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator()) // عرض دائرة التحميل إذا كانت القائمة فارغة
-                    : orders.isEmpty
-                        ? Center(child: Text("لا توجد طلبات حالياً"))
-                        : ListView.builder(
-                            itemCount: orders.length,
-                            itemBuilder: (context, index) {
-                              final order = orders[index]; // الحصول على الطلب الحالي
-                              final status = order['status']!;
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OrderDetailsScreen(order: order),  // تمرير البيانات إلى الشاشة الجديدة
-                                  ),
-                                );
-                                },
-                                child: Card(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: defaultPadding / 2,
-                                      horizontal: defaultPadding),
-                                  elevation: 4.0,
-                                  child: ListTile(
-                                    leading: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.network(
-                                        order['image']!,
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
+            Expanded(
+              child: isLoggedIn
+                ? RefreshIndicator(
+                    onRefresh: fetchOrders,  // سيتم استدعاء هذه الدالة عند السحب إلى الأسفل
+                    child: isLoading
+                        ? Center(child: CircularProgressIndicator()) // عرض دائرة التحميل إذا كانت القائمة فارغة
+                        : orders.isEmpty
+                            ? Center(child: Text("لا توجد طلبات حالياً"))
+                            : ListView.builder(
+                                itemCount: orders.length,
+                                itemBuilder: (context, index) {
+                                  final order = orders[index]; // الحصول على الطلب الحالي
+                                  final status = order['status']!;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OrderDetailsScreen(order: order),  // تمرير البيانات إلى الشاشة الجديدة
+                                      ),
+                                    );
+                                    },
+                                    child: Card(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: defaultPadding / 2,
+                                          horizontal: defaultPadding),
+                                      elevation: 4.0,
+                                      child: ListTile(
+                                        leading: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                          child: Image.network(
+                                            order['image']!,
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        title: Text(order['name']!),
+                                        subtitle: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('${order['date']}'),
+                                            Text('طلب استلام | ${translateStatus(status)}'),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'السعر: ${order['price']}',
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              getStatusIcon(status),
+                                              color: _getStatusColor(status),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            const Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 16.0,
+                                              color: Colors.grey,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    title: Text(order['name']!),
-                                    subtitle: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('${order['date']}'),
-                                        Text('طلب استلام | ${translateStatus(status)}'),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'السعر: ${order['price']}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          getStatusIcon(status),
-                                          color: _getStatusColor(status),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        const Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 16.0,
-                                          color: Colors.grey,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-              ),
+                                  );
+                                },
+                              ),
+                  )
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("يجب أن تكون مسجل دخول لعرض الطلبات"),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, logInScreenRoute);
+                          },
+                          child: Text("تسجيل الدخول"),
+                        ),
+                      ],
+                    ),
+                  ),
             ),
-             ],
+          ],
         ),
       ),
     );

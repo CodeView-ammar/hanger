@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';  // لاستخدا�
 import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/components/cart_button.dart';
 import 'package:shop/components/custom_modal_bottom_sheet.dart';
+import 'package:shop/route/route_constants.dart';
 import 'package:shop/screens/product/views/added_to_cart_message_screen.dart';
 
 import '../../../constants.dart';
@@ -50,11 +51,7 @@ class _ProductBuyNowScreenState extends State<ProductBuyNowScreen> {
 
     if (userId == null) {
       // إذا لم يكن ID المستخدم موجودًا، يمكنك عرض رسالة خطأ
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('لا يوجد مستخدم مسجل.'),
-        ),
-      );
+      Navigator.pushNamed(context, logInScreenRoute);
       return;
     }
 

@@ -74,17 +74,17 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
 
   // دالة للتنقل بناءً على حالة الرقم
   void _navigateBasedOnPhoneStatus() async {
-    bool isPhoneRegistered = await _isPhoneNumberRegistered();
+    // bool isPhoneRegistered = await _isPhoneNumberRegistered();
     
-    if (isPhoneRegistered) {
-      Navigator.pushNamedAndRemoveUntil(
-          context,
-          entryPointScreenRoute, // الشاشة التي تلي التحقق
-          ModalRoute.withName(logInScreenRoute),
-        ); // التوجه إلى الشاشة الرئيسية
-    } else {
-      Navigator.pushNamed(context, logInScreenRoute); // التوجه إلى شاشة تسجيل الدخول
-    }
+    // if (isPhoneRegistered) {
+    //   Navigator.pushNamedAndRemoveUntil(
+    //       context,
+    //       entryPointScreenRoute, // الشاشة التي تلي التحقق
+    //       ModalRoute.withName(logInScreenRoute),
+    //     ); // التوجه إلى الشاشة الرئيسية
+    // } else {
+      Navigator.pushNamed(context, entryPointScreenRoute); // التوجه إلى شاشة تسجيل الدخول
+    // }
   }
 
   @override

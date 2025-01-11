@@ -52,9 +52,9 @@ class _EntryPointState extends State<EntryPoint> {
     String? userId = prefs.getString('userid');
 
     if (userId == null) {
-      Navigator.pushNamed(context, logInScreenRoute);
+      // Navigator.pushNamed(context, logInScreenRoute);
       return;
-    }
+    }else{
     final response = await http.get(Uri.parse('${APIConfig.orderstatusUrl}?user=$userId'));
 
     if (response.statusCode == 200) {
@@ -77,6 +77,7 @@ class _EntryPointState extends State<EntryPoint> {
       }
     } else {
       print("فشل في جلب حالة الطلب: ${response.statusCode}");
+    }
     }
   }
 
