@@ -33,11 +33,11 @@ class AddedToCartMessageScreen extends StatelessWidget {
               ),
               const SizedBox(height: defaultPadding / 2),
               const Text(
-                "انقر على زر الخروج لإكمال عملية الشراء.",
+                "انقر على زر المواصلة لإكمال عملية الطلب.",
                 textAlign: TextAlign.center,
               ),
               const Spacer(flex: 2),
-              OutlinedButton(
+              ElevatedButton(
                 onPressed: () {
                   // إغلاق شاشة AddedToCartMessageScreen و BottomSheet
                   Navigator.pop(context); // إغلاق الشاشة الحالية (AddedToCartMessageScreen)
@@ -46,20 +46,6 @@ class AddedToCartMessageScreen extends StatelessWidget {
                 child: const Text("مواصلة"),
               ),
               const SizedBox(height: defaultPadding),
-              ElevatedButton(
-                onPressed: () {
-                  // التأكد من أن laundryId ليس null
-                  final validLaundryId = laundryId ?? 0;  // تعيين قيمة افتراضية إذا كانت null
-                  // الانتقال إلى شاشة ReviewOrderScreen مع تمرير laundryId
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReviewOrderScreen(laundryId: validLaundryId,total: 0.00,isPaid: false,distance: 0,duration: ''),
-                    ),
-                  );
-                },
-                child: const Text("الدفع"),
-              ),
               const Spacer(),
             ],
           ),

@@ -68,16 +68,7 @@ class _MapScreenState extends State<MapScreen> {
                     _controller.complete(controller);
                   },
                 ),
-                Positioned(
-                  top: 30,
-                  left: 15,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop(); // العودة إلى الشاشة السابقة
-                    },
-                    child: Icon(Icons.arrow_back),
-                  ),
-                ),
+               
                 Positioned(
                   bottom: 10,
                   right: 10,

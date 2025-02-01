@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shop/main.dart';
 
 class EnableNotificationScreen extends StatelessWidget {
   const EnableNotificationScreen({super.key});
@@ -74,6 +76,27 @@ class EnableNotificationScreen extends StatelessWidget {
     );
   }
 
+  // إضافة دالة لإرسال الإشعارات
+  Future<void> showNotification() async {
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      '1',
+      'ammar',
+      channelDescription: 'وصف القناة',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    
+    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+    
+    await flutterLocalNotificationsPlugin.show(
+      0, // ID الخاص بالإشعار
+      'عرض الجمعه',
+      'محتوى الإشعار',
+      platformDetails,
+      payload: 'data',
+    );
+  }
+
   Future<void> _enableNotifications(BuildContext context) async {
     // طلب صلاحيات الإشعارات
     final status = await Permission.notification.request();
@@ -83,6 +106,7 @@ class EnableNotificationScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Notifications enabled!')),
       );
+      showNotification(); // إرسال إشعار عند تمكين الإشعارات
     } else if (status.isDenied) {
       // تم رفض الصلاحيات
       ScaffoldMessenger.of(context).showSnackBar(

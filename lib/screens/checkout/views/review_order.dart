@@ -15,8 +15,15 @@ class ReviewOrderScreen extends StatefulWidget {
   final bool isPaid;
   final double distance;
   final String duration;
-  const ReviewOrderScreen({Key? key, required this.laundryId, required this.total,required this.isPaid, required this.distance,
-   required this.duration}) : super(key: key);
+
+  const ReviewOrderScreen({
+    Key? key,
+    required this.laundryId,
+    required this.total,
+    required this.isPaid,
+    required this.distance,
+    required this.duration,
+  }) : super(key: key);
 
   @override
   _ReviewOrderScreenState createState() => _ReviewOrderScreenState();
@@ -33,6 +40,7 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
   String selectedPayment = 'عادي'; // default value
   String? defaultPaymentMethod; // Store default payment method
   String? price_per_kg;
+
   @override
   void dispose() {
     mapController.dispose();
@@ -45,53 +53,54 @@ class _ReviewOrderScreenState extends State<ReviewOrderScreen> {
     _loadCustomMarker(); // Load custom marker image
     fetchAddress();
     fetchDefaultPaymentMethod();
- fetchPricePerKg().then((price) {
-    if (price != null) {
-      setState(() {
-        price_per_kg = price; // تأكد من أن price_per_kg هو من نوع double
-      });
-    } else {
-      print('لم يتم جلب السعر.');
-    }
-  });
+    fetchPricePerKg().then((price) {
+      if (price != null) {
+        setState(() {
+          price_per_kg = price; // تأكد من أن price_per_kg هو من نوع double
+        });
+      } else {
+        print('لم يتم جلب السعر.');
+      }
+    });
   }
-Future<String?> fetchPricePerKg() async {
-  final response = await http.get(Uri.parse(APIConfig.deliverysettingEndpoint));
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    // تأكد من أن price_per_kg يتم تخزينه كـ double
-    print(data[0]);
-    return data[0]['price_per_kg'];
-  } else {
-    print('فشل في جلب السعر: ${response.statusCode}');
-    return null; // يمكنك إرجاع null عند الفشل
+  Future<String?> fetchPricePerKg() async {
+    final response = await http.get(Uri.parse(APIConfig.deliverysettingEndpoint));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print(data[0]);
+      return data[0]['price_per_kg'];
+    } else {
+      print('فشل في جلب السعر: ${response.statusCode}');
+      return null; // يمكنك إرجاع null عند الفشل
+    }
   }
-}
-double get totalAmount {
-  double deliveryPrice = (price_per_kg != null && widget.distance != null) 
-      ? (double.tryParse(price_per_kg!)! * widget.distance) 
-      : 0.0;
-  return (widget.total + deliveryPrice);
-}
+
+  double get totalAmount {
+    double deliveryPrice = (price_per_kg != null && widget.distance != null)
+        ? (double.tryParse(price_per_kg!)! * widget.distance)
+        : 0.0;
+    return (widget.total + deliveryPrice);
+  }
+
   Future<void> fetchDefaultPaymentMethod() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');
 
-    // Send request to the API
     final response = await http.post(
       Uri.parse(APIConfig.PaymentUrl),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'user': userId,
-      }),
-      
+      body: json.encode({'user': userId}),
     );
+
+    print('Response Status Code: ${response.statusCode}'); // طباعة الحالة
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       setState(() {
-
+        // تأكد من تعيين defaultPaymentMethod بشكل صحيح
+        defaultPaymentMethod = responseData['payment_method'] ?? 'غير محدد';
         // تحويل طريقة الدفع إلى القيمة التي سيقبلها الـ API
         if (defaultPaymentMethod == "الدفع عند الاستلام") {
           defaultPaymentMethod = "COD";
@@ -105,9 +114,9 @@ double get totalAmount {
         } else {
           defaultPaymentMethod = "الدفع عند الاستلام"; // الدفع عند الاستلام
         }
-
       });
     } else {
+      print('Error: ${response.body}'); // طباعة الأخطاء
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يجب تحديد طريقة الدفع')),
       );
@@ -129,7 +138,7 @@ double get totalAmount {
     if (defaultPaymentMethod == "الدفع باستخدام STC") defaultPaymentMethod = "STC";
 
     try {
-
+      print(defaultPaymentMethod);
       final response = await http.post(
         Uri.parse('${APIConfig.orderSubmitUrl}'),
         headers: {'Content-Type': 'application/json'},
@@ -138,7 +147,7 @@ double get totalAmount {
           'userId': userId,
           'delegateNote': delegateNote,
           'paymentMethod': defaultPaymentMethod,
-          "isPaid":widget.isPaid,
+          "isPaid": widget.isPaid,
         }),
       );
 
@@ -237,20 +246,20 @@ double get totalAmount {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 240, 237, 237),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: TimeIndicator(
-                        time: widget.duration.split("mins")[0] + '-' +
-                              (int.tryParse(widget.duration.split("mins")[0])! + 10).toString(),
-                      ),
-                    ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 240, 237, 237),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: TimeIndicator(
+                    time: widget.duration.contains("mins")
+                        ? (int.tryParse(widget.duration.split("mins")[0]) ?? 0 + 10).toString()
+                        : "",
                   ),
-
+                ),
+              ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -403,7 +412,6 @@ double get totalAmount {
                   ],
                 ),
               ),
-             
               const SizedBox(height: 20),
               Container(
                 padding: const EdgeInsets.all(16),
@@ -433,10 +441,9 @@ double get totalAmount {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AddCardDetailsScreen(),
+                                builder: (context) => AddCardDetailsScreen(name_windows: "main"),
                                 settings: RouteSettings(
-                                  arguments:[ double.tryParse(totalAmount.toStringAsFixed(2)),widget.laundryId]  // تمرير المبلغ الإجمالي
-                                  
+                                  arguments: [double.tryParse(totalAmount.toStringAsFixed(2)), widget.laundryId]  // تمرير المبلغ الإجمالي
                                 ),
                               ),
                             );
@@ -470,12 +477,12 @@ double get totalAmount {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green[100],
-                                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(0),   // الزاوية العليا اليسرى
-                      bottomRight: Radius.circular(0),  // الزاوية العليا اليمنى
-                      topLeft: Radius.circular(8), // الزاوية السفلى اليسرى
-                      topRight: Radius.circular(8), // الزاوية السفلى اليسرى
-                    ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(0),   // الزاوية العليا اليسرى
+                    bottomRight: Radius.circular(0),  // الزاوية العليا اليمنى
+                    topLeft: Radius.circular(8), // الزاوية السفلى اليسرى
+                    topRight: Radius.circular(8), // الزاوية السفلى اليسرى
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -490,40 +497,39 @@ double get totalAmount {
                     ),
                   ],
                 ),
-                
               ),
               
-             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.green[100],
-                borderRadius: BorderRadius.circular(0),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'سعر التوصيل',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    Text(
+                      '${(price_per_kg != null && widget.distance != null) ? (double.tryParse(price_per_kg!)! * widget.distance).toStringAsFixed(2) : '0.00'} ريال',
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'سعر التوصيل',
-                    style: TextStyle(fontSize: 10),
-                  ),
-                  Text(
-                    '${(price_per_kg != null && widget.distance != null) ? (double.tryParse(price_per_kg!)! * widget.distance).toStringAsFixed(2) : '0.00'} ريال',
-                    style: const TextStyle(fontSize: 10),
-                  ),
-                ],
-              ),
-            ),
 
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green[100],
-                borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(0),   // الزاوية العليا اليسرى
-                      topRight: Radius.circular(0),  // الزاوية العليا اليمنى
-                      bottomLeft: Radius.circular(8), // الزاوية السفلى اليسرى
-                      bottomRight: Radius.circular(8), // الزاوية السفلى اليسرى
-                    ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(0),   // الزاوية العليا اليسرى
+                    topRight: Radius.circular(0),  // الزاوية العليا اليمنى
+                    bottomLeft: Radius.circular(8), // الزاوية السفلى اليسرى
+                    bottomRight: Radius.circular(8), // الزاوية السفلى اليسرى
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -538,18 +544,17 @@ double get totalAmount {
                     ),
                   ],
                 ),
-                
               ),
-               const SizedBox(height: 8),
-                    // إظهار حالة الدفع (مدفوع أو غير مدفوع)
-                    Text(
-                      widget.isPaid ? 'تم الدفع' : 'لم يتم الدفع',
-                      style: TextStyle(
-                        fontSize: 14, 
-                        color: widget.isPaid ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              const SizedBox(height: 8),
+              // إظهار حالة الدفع (مدفوع أو غير مدفوع)
+              Text(
+                widget.isPaid ? 'تم الدفع' : 'لم يتم الدفع',
+                style: TextStyle(
+                  fontSize: 14, 
+                  color: widget.isPaid ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 24),
               Center(
                 child: ElevatedButton(

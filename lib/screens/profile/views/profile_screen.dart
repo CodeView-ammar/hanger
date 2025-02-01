@@ -13,187 +13,185 @@ class ProfileScreen extends StatelessWidget {
 
   Future<String> getUserPhoneNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userPhone') ?? '';
+    return prefs.getString('userPhone') ?? '';  // إرجاع رقم الهاتف المحفوظ
+  }
+
+  Future<bool> checkNotificationPermission() async {
+    // هنا يمكنك استخدام مكتبة للتحقق من صلاحيات الإشعارات
+    // على سبيل المثال، إذا كنت تستخدم firebase_messaging:
+    // final Messaging messaging = FirebaseMessaging.instance;
+    // NotificationSettings settings = await messaging.requestPermission();
+    // return settings.authorizationStatus == AuthorizationStatus.authorized;
+
+    // في هذا المثال، سنقوم بإرجاع قيمة عشوائية (تغييرها بناءً على منطقك):
+    return Future.value(true); // أو false حسب الحاجة
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<String>(
-        future: getUserPhoneNumber(),  // استدعاء الدالة غير المتزامنة
+        future: getUserPhoneNumber(),  // استدعاء الدالة غير المتزامنة للحصول على رقم الهاتف
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // عرض مؤشر التحميل أثناء الانتظار
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // في حال حدوث خطأ أثناء جلب البيانات
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            // في حال جلب البيانات بنجاح
             String userPhoneNumber = snapshot.data!;
-            return ListView(
-              children: [
-                ProfileCard(
-                  name: userPhoneNumber,
-                  email: "ammarwadood0@gmail.com",
-                  imageSrc: "https://i.imgur.com/aA8ST9l.jpeg",
-                  press: () {
-                    Navigator.pushNamed(context, userInfoScreenRoute);
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: defaultPadding, vertical: defaultPadding * 1.5),
+            return FutureBuilder<bool>(
+              future: checkNotificationPermission(),
+              builder: (context, notificationSnapshot) {
+                if (notificationSnapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (notificationSnapshot.hasError) {
+                  return Center(child: Text('Error: ${notificationSnapshot.error}'));
+                } else if (notificationSnapshot.hasData) {
+                  bool isNotificationEnabled = notificationSnapshot.data!;
 
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                  child: Text(
-                    "حساب",
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                const SizedBox(height: defaultPadding / 2),
-                ProfileMenuListTile(
-                  text: "طلبات",
-                  svgSrc: "assets/icons/Order.svg",
-                  press: () {
-                    Navigator.pushNamed(context, ordersScreenRoute);
-                  },
-                ),
-                // ProfileMenuListTile(
-                //   text: "المرتجعات",
-                //   svgSrc: "assets/icons/Return.svg",
-                //   press: () {},
-                // ),
-                // ProfileMenuListTile(
-                //   text: "قائمة الرغبات",
-                //   svgSrc: "assets/icons/Wishlist.svg",
-                //   press: () {},
-                // ),
-                ProfileMenuListTile(
-                  text: "العناوين",
-                  svgSrc: "assets/icons/Address.svg",
-                  press: () {
-                    Navigator.pushNamed(context, addressesScreenRoute);
-                  },
-                ),
-                // ProfileMenuListTile(
-                //   text: "قسط",
-                //   svgSrc: "assets/icons/card.svg",
-                //   press: () {
-                //     Navigator.pushNamed(context, emptyPaymentScreenRoute);
-                //   },
-                // ),
-                ProfileMenuListTile(
-                  text: "محفظة",
-                  svgSrc: "assets/icons/Wallet.svg",
-                  press: () {
-                    Navigator.pushNamed(context, walletScreenRoute);
-                  },
-                ),
-                const SizedBox(height: defaultPadding),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: defaultPadding, vertical: defaultPadding / 2),
-                  child: Text(
-                    "التخصيص",
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                DividerListTileWithTrilingText(
-                  svgSrc: "assets/icons/Notification.svg",
-                  title: "إشعار",
-                  trilingText: "Off",
-                  press: () {
-                    Navigator.pushNamed(context, enableNotificationScreenRoute);
-                  },
-                ),
-                // ProfileMenuListTile(
-                //   text: "التفضيلات",
-                //   svgSrc: "assets/icons/Preferences.svg",
-                //   press: () {
-                //     Navigator.pushNamed(context, preferencesScreenRoute);
-                //   },
-                // ),
-                const SizedBox(height: defaultPadding),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: defaultPadding, vertical: defaultPadding / 2),
-                  child: Text(
-                    "إعدادات",
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                // ProfileMenuListTile(
-                //   text: "لغة",
-                //   svgSrc: "assets/icons/Language.svg",
-                //   press: () {
-                //     Navigator.pushNamed(context, selectLanguageScreenRoute);
-                //   },
-                // ),
-                ProfileMenuListTile(
-                  text: "موقع",
-                  svgSrc: "assets/icons/Location.svg",
-                  press: () {},
-                ),
-                const SizedBox(height: defaultPadding),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: defaultPadding, vertical: defaultPadding / 2),
-                  child: Text(
-                    "المساعدة والدعم",
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                ProfileMenuListTile(
-                  text: "احصل على المساعدة",
-                  svgSrc: "assets/icons/Help.svg",
-                  press: () {
-                    Navigator.pushNamed(context, getHelpScreenRoute);
-                  },
-                ),
-                ProfileMenuListTile(
-                  text: "التعليمات",
-                  svgSrc: "assets/icons/FAQ.svg",
-                  press: () {
-                    Navigator.pushNamed(context, instructionsScreenRoute);
-
-                  },
-                  isShowDivider: false,
-                ),
-                const SizedBox(height: defaultPadding),
-
-                // تسجيل الخروج
-                ListTile(
-                  onTap: () async {
-                    // تنفيذ عملية تسجيل الخروج هنا
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.clear(); // مسح جميع البيانات المخزنة
-
-                    // الانتقال إلى شاشة تسجيل الدخول
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      logInScreenRoute, // إعادة التوجيه إلى شاشة تسجيل الدخول
-                      (route) => false, // إزالة جميع الشاشات السابقة
-                    );
-                  },
-                  minLeadingWidth: 24,
-                  leading: SvgPicture.asset(
-                    "assets/icons/Logout.svg",
-                    height: 24,
-                    width: 24,
-                    colorFilter: const ColorFilter.mode(
-                      errorColor,
-                      BlendMode.srcIn,
-                    ),
-                  ),
-                  title: const Text(
-                    "تسجيل الخروج",
-                    style: TextStyle(color: errorColor, fontSize: 14, height: 1),
-                  ),
-                ),
-              ],
+                  return ListView(
+                    children: [
+                      ProfileCard(
+                        name: userPhoneNumber,
+                        imageSrc: "",
+                        press: () {
+                          Navigator.pushNamed(context, userInfoScreenRoute);
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: defaultPadding, vertical: defaultPadding * 1.5),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+                        child: Text(
+                          "حساب",
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      const SizedBox(height: defaultPadding / 2),
+                      ProfileMenuListTile(
+                        text: "طلبات",
+                        svgSrc: "assets/icons/Order.svg",
+                        press: () {
+                          Navigator.pushNamed(context, ordersScreenRoute);
+                        },
+                      ),
+                      ProfileMenuListTile(
+                        text: "العناوين",
+                        svgSrc: "assets/icons/Address.svg",
+                        press: () {
+                          Navigator.pushNamed(context, addressesScreenRoute);
+                        },
+                      ),
+                      ProfileMenuListTile(
+                        text: "محفظة",
+                        svgSrc: "assets/icons/Wallet.svg",
+                        press: () {
+                          Navigator.pushNamed(context, walletScreenRoute);
+                        },
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: defaultPadding, vertical: defaultPadding / 2),
+                        child: Text(
+                          "التخصيص",
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      DividerListTileWithTrilingText(
+                        svgSrc: "assets/icons/Notification.svg",
+                        title: "إشعار",
+                        trilingText: isNotificationEnabled ? "On" : "Off", // تغيير النص بناءً على الحالة
+                        press: () {
+                          Navigator.pushNamed(context, enableNotificationScreenRoute);
+                        },
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: defaultPadding, vertical: defaultPadding / 2),
+                        child: Text(
+                          "إعدادات",
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      ProfileMenuListTile(
+                        text: "موقع",
+                        svgSrc: "assets/icons/Location.svg",
+                        press: () {},
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: defaultPadding, vertical: defaultPadding / 2),
+                        child: Text(
+                          "المساعدة والدعم",
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      ProfileMenuListTile(
+                        text: "احصل على المساعدة",
+                        svgSrc: "assets/icons/Help.svg",
+                        press: () {
+                          Navigator.pushNamed(context, getHelpScreenRoute);
+                        },
+                      ),
+                      ProfileMenuListTile(
+                        text: "التعليمات",
+                        svgSrc: "assets/icons/FAQ.svg",
+                        press: () {
+                          Navigator.pushNamed(context, instructionsScreenRoute);
+                        },
+                        isShowDivider: false,
+                      ),
+                      const SizedBox(height: defaultPadding),
+                      ListTile(
+                        onTap: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          if (userPhoneNumber.isEmpty) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              logInScreenRoute,
+                              (route) => false,
+                            );
+                          } else {
+                            await prefs.clear();
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              logInScreenRoute,
+                              (route) => false,
+                            );
+                          }
+                        },
+                        minLeadingWidth: 24,
+                        leading: SvgPicture.asset(
+                          userPhoneNumber.isEmpty
+                              ? "assets/icons/login.svg"
+                              : "assets/icons/Logout.svg",
+                          height: 24,
+                          width: 24,
+                          colorFilter: ColorFilter.mode(
+                            userPhoneNumber.isEmpty ? Colors.green : errorColor,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        title: Text(
+                          userPhoneNumber.isEmpty ? "تسجيل الدخول" : "تسجيل الخروج",
+                          style: TextStyle(
+                            color: userPhoneNumber.isEmpty ? Colors.green : errorColor,
+                            fontSize: 14,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Center(child: Text('No data found.'));
+                }
+              },
             );
           } else {
             return Center(child: Text('No data found.'));

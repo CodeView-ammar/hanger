@@ -34,7 +34,7 @@ class ServiceModel {
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
       id: json['id'],
-      name: utf8.decode(json['name'].codeUnits)+'aaaa',
+      name: utf8.decode(json['name'].codeUnits),
       description: json['description'],
       price: double.parse(json['price']),
       urgentPrice: double.parse(json['urgent_price']),

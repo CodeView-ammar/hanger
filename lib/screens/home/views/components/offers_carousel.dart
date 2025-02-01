@@ -61,7 +61,7 @@ class _OffersCarouselState extends State<OffersCarousel> {
           _bannerData = data
               .map((item) => {
                     'image': item['image'],
-                    'caption': utf8.decode(item['caption'].codeUnits),
+                    'caption': item['caption'] != null ? utf8.decode(item['caption'].codeUnits) : '', // إصلاح هنا
                     'order': item['order'],
                   })
               .toList();
@@ -95,7 +95,7 @@ class _OffersCarouselState extends State<OffersCarousel> {
             itemBuilder: (context, index) {
               final banner = _bannerData[index];
               return BannerMStyle1(
-                text: banner['caption'],
+                text: banner['caption'] ?? '',
                 image: banner['image'] ?? "https://i.imgur.com/aA8ST9l.jpeg",
                 press: () {
                   // Add your banner click logic here
@@ -118,7 +118,7 @@ class _OffersCarouselState extends State<OffersCarousel> {
                         child: DotIndicator(
                           isActive: index == _selectedIndex,
                           activeColor: Colors.white70,
-                          inActiveColor: Colors.white54,
+                          inActiveColor: const Color.fromARGB(179, 255, 255, 255),
                         ),
                       );
                     },

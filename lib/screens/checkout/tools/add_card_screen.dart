@@ -3,13 +3,21 @@ import 'package:moyasar/moyasar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shop/components/api_extintion/url_api.dart';
+import 'package:shop/screens/checkout/transaction.dart';
 import 'package:shop/screens/checkout/views/review_order.dart';
+import 'package:shop/screens/discover/views/courier_order_details.dart';
 
 class AddCardScreen extends StatefulWidget {
   final double total; // المبلغ الذي تم تمريره
   final int laundryId; // ID المغسلة
+  final String? name_windows;
 
-  AddCardScreen({super.key, required this.total, required this.laundryId});
+  AddCardScreen({
+    super.key, 
+    required this.total, 
+    required this.laundryId,
+    required this.name_windows,
+  });
 
   @override
   _AddCardScreenState createState() => _AddCardScreenState();
@@ -25,30 +33,43 @@ class _AddCardScreenState extends State<AddCardScreen> {
     if (result is PaymentResponse) {
       switch (result.status) {
         case PaymentStatus.paid:
-          print("تم الدفع بنجاح");
+          // addTransaction(
+          //   "debit",
+          //   widget.total,
+          //    "تم دفع المبلغ",
+          //     context
+          //     );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("تم الدفع بنجاح")),
           );
-
-          // حفظ بيانات البطاقة بعد التحقق من الدفع
-          // saveCardData(result, context);
-  // تأجيل الرجوع حتى بعد تحديث الشجرة
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          // Navigator.pop(context, true);  // تم الدفع بنجاح
-          // الانتقال إلى ReviewOrderScreen مع تمرير المتغيرات
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReviewOrderScreen(
-                laundryId: widget.laundryId,
-                total: widget.total,
-                isPaid: true,
-                distance: 0,
-                duration: '',
-              ),
-            ),
-          );
-        });
+          // تأجيل الرجوع حتى بعد تحديث الشجرة
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            // الانتقال إلى الشاشة المناسبة بناءً على `name_windows`
+            if (widget.name_windows == "main") {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ReviewOrderScreen(
+                    laundryId: widget.laundryId,
+                    total: widget.total,
+                    isPaid: true,
+                    distance: 0,
+                    duration: '',
+                  ),
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CourierOrderDetailsScreen(
+                    orderId: widget.laundryId,
+                    isPaid: true,
+                  ),
+                ),
+              );
+            }
+          });
           break;
         case PaymentStatus.failed:
           print("فشل في الدفع");
@@ -60,47 +81,10 @@ class _AddCardScreenState extends State<AddCardScreen> {
         case PaymentStatus.initiated:
         case PaymentStatus.authorized:
         case PaymentStatus.captured:
-          // TODO: Handle these cases if needed.
+          // يمكن معالجة هذه الحالات إذا لزم الأمر
           break;
       }
     }
-  }
-
-  Future<void> saveCardData(PaymentResponse result, BuildContext context) async {
-    // final url = Uri.parse('https://hanger.metasoft-ar.com/api/payment-methods-details/');
-
-    // الحصول على البيانات من PaymentResponse أو مدخلات المستخدم
-    // String cardNumber = "1123091231"; // استبدل هذا برقم البطاقة الفعلي
-    // String cardHolderName = "عمار"; // استبدل هذا باسم صاحب البطاقة
-    // String cardExpiryDate = "12/25"; // استبدل هذا بتاريخ انتهاء البطاقة
-    // String cvv = "124"; // استبدل هذا بـ CVV الخاص بالبطاقة
-
-    // final response = await http.post(
-    //   url,
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: jsonEncode({
-    //     'card_name': cardHolderName,
-    //     'card_number': cardNumber,
-    //     'card_expiry_date': cardExpiryDate,
-    //     'cvv': cvv,
-    //     'payment_method': "CARD",
-    //   }),
-    // );
-
-    // print(response.statusCode);
-    // if (response.statusCode == 200 || response.statusCode == 201) {
-    //   print("تم حفظ بيانات البطاقة بنجاح");
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("تم حفظ بيانات البطاقة بنجاح")),
-    //   );
-    // } else {
-    //   print("فشل في حفظ بيانات البطاقة: ${response.body}");
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(content: Text("فشل في حفظ بيانات البطاقة")),
-    //   );
-    // }
   }
 
   @override

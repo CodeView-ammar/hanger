@@ -118,80 +118,99 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   // دالة لترجمة الحالة
-  String translateStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return 'قيد الانتظار';
-      case 'courier_accepted':
-        return 'تم قبول الطلب من قبل المندوب';
-      case 'courier_on_the_way':
-        return 'المندوب في الطريق';
-      case 'picked_up_from_customer':
-        return 'تم استلام الطلب من العميل';
-      case 'delivered_to_laundry':
-        return 'تم تسليم الطلب للمغسلة';
-      case 'in_progress':
-        return 'قيد المعالجة';
-      case 'ready_for_delivery':
-        return 'جاهز للتسليم';
-      case 'completed':
-        return 'تم إتمام الطلب';
-      case 'canceled':
-        return 'تم إلغاء الطلب';
-      default:
-        return 'حالة غير معروفة';
-    }
-  }
+String translateStatus(String status) {
+  switch (status) {
+    case 'pending':
+      return 'قيد الانتظار';
+    case 'courier_accepted':
+      return 'تم قبول الطلب من قبل المندوب';
+    case 'courier_on_the_way':
+      return 'المندوب في الطريق';
+    case 'picked_up_from_customer':
+      return 'تم استلام الطلب من العميل';
+    case 'delivered_to_laundry':
+      return 'تم تسليم الطلب للمغسلة';
+    case 'in_progress':
+      return 'قيد المعالجة';
+    case 'ready_for_delivery':
+      return 'جاهز للتسليم';
+    case 'completed':
+      return 'تم إتمام الطلب';
+    case 'canceled':
+      return 'تم إلغاء الطلب';
+    case 'customer_accepted_end':
+      return 'إستلام الطلب بنفسك';
+    case 'courier_accepted_end':
+      return 'إستلام الطلب عبر المندوب';
 
-  // دالة لتحديد الأيقونة بناءً على الحالة
-  IconData getStatusIcon(String status) {
-    switch (status) {
-      case 'pending':
-      case 'courier_accepted':
-        return Icons.hourglass_empty;  // الساعة الرملية
-      case 'courier_on_the_way':
-        return Icons.local_shipping;  // شاحنة
-      case 'picked_up_from_customer':
-        return Icons.thumb_up;  // إعجاب
-      case 'delivered_to_laundry':
-        return Icons.store;  // مغسلة
-      case 'in_progress':
-        return Icons.build;  // أدوات العمل
-      case 'ready_for_delivery':
-        return Icons.check_circle;  // دائرة صح
-      case 'completed':
-        return Icons.check;  // صح
-      case 'canceled':
-        return Icons.cancel;  // إلغاء
-      default:
-        return Icons.help_outline;  // سؤال
-    }
+    case 'courier_received':
+      return 'تم استلام الطلب من المندوب النهائي';
+    default:
+      return 'حالة غير معروفة';
   }
+}
 
-  // دالة لتحديد اللون بناءً على الحالة
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
-      case 'courier_accepted':
-        return Colors.orange;
-      case 'courier_on_the_way':
-        return Colors.blue;
-      case 'picked_up_from_customer':
-        return Colors.green;
-      case 'delivered_to_laundry':
-        return Colors.green;
-      case 'in_progress':
-        return Colors.blue;
-      case 'ready_for_delivery':
-        return Colors.green;
-      case 'completed':
-        return Colors.green;
-      case 'canceled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+// دالة لتحديد الأيقونة بناءً على الحالة
+IconData getStatusIcon(String status) {
+  switch (status) {
+    case 'pending':
+    case 'courier_accepted':
+      return Icons.hourglass_empty;  // الساعة الرملية
+    case 'courier_on_the_way':
+      return Icons.local_shipping;  // شاحنة
+    case 'picked_up_from_customer':
+      return Icons.thumb_up;  // إعجاب
+    case 'delivered_to_laundry':
+      return Icons.store;  // مغسلة
+    case 'in_progress':
+      return Icons.build;  // أدوات العمل
+    case 'ready_for_delivery':
+      return Icons.check_circle;  // دائرة صح
+    case 'completed':
+      return Icons.check;  // صح
+    case 'canceled':
+      return Icons.cancel;  // إلغاء
+    case 'customer_accepted_end':
+      return Icons.person_add_alt_1;  // شخص مع إضافة
+    case 'courier_accepted_end':
+      return Icons.delivery_dining;  // توصيل
+     case 'courier_received':
+      return Icons.assignment_turned_in;  // تم التسليم للمندوب
+    default:
+      return Icons.help_outline;  // سؤال
   }
+}
+
+// دالة لتحديد اللون بناءً على الحالة
+Color _getStatusColor(String status) {
+  switch (status) {
+    case 'pending':
+    case 'courier_accepted':
+      return Colors.orange;
+    case 'courier_on_the_way':
+      return Colors.blue;
+    case 'picked_up_from_customer':
+      return Colors.green;
+    case 'delivered_to_laundry':
+      return Colors.green;
+    case 'in_progress':
+      return Colors.blue;
+    case 'ready_for_delivery':
+      return Colors.green;
+    case 'completed':
+      return Colors.green;
+    case 'canceled':
+      return Colors.red;
+    case 'customer_accepted_end':
+      return Colors.lightGreen;  // لون أخضر فاتح
+    case 'courier_accepted_end':
+      return Colors.indigo;  // لون أزرق مائل للبنفسجي
+    case 'courier_received':
+      return Colors.greenAccent;  // أخضر فاتح
+    default:
+      return Colors.grey;
+  }
+}
 
   @override
   Widget build(BuildContext context) {

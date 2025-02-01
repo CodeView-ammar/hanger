@@ -1,48 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop/components/network_image_with_loader.dart';
+import 'package:shop/screens/auth/views/login_screen.dart';
+import 'package:shop/screens/profile/views/profile_screen.dart';
 
 import '../../../../constants.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends StatefulWidget {
   const ProfileCard({
     super.key,
     required this.name,
-    required this.email,
-    required this.imageSrc,
     this.proLableText = "Pro",
     this.isPro = false,
     this.press,
     this.isShowHi = true,
     this.isShowArrow = true,
+    this.imageSrc = "", // تغيير لتقبل قيمة فارغة
   });
 
-  final String name, email, imageSrc;
+  final String name;
   final String proLableText;
   final bool isPro, isShowHi, isShowArrow;
+  final String imageSrc;  // إذا كانت فارغة سنعرض الأيقونة بدلاً من الصورة
   final VoidCallback? press;
+
+  @override
+  _ProfileCardState createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> {
+  late bool isLoggedIn = false;  // متغير لتخزين حالة تسجيل الدخول
+  String phoneNumber = ""; // لتخزين رقم الهاتف بعد تسجيل الدخول
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  // دالة للتحقق من حالة تسجيل الدخول
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? savedPhone = prefs.getString('userPhone');  // جلب رقم الهاتف
+
+    setState(() {
+      // إذا كان هناك رقم هاتف محفوظ، يعني أن المستخدم مسجل دخول
+      isLoggedIn = savedPhone != null && savedPhone.isNotEmpty;
+      phoneNumber = savedPhone ?? "";  // إذا كان موجودًا، قم بتخزينه في المتغير
+    });
+  }
+
+  // دالة للتنقل بين الشاشات بناءً على حالة المستخدم
+  void _onTap() {
+    if (isLoggedIn) {
+      // إذا كان المستخدم مسجل دخول، افتح الشاشة الحالية
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileScreen()),  // تأكد من تعديل هذا ليفتح شاشة الملف الشخصي أو الصفحة التي تريدها.
+      );
+    } else {
+      // إذا كان المستخدم غير مسجل، افتح شاشة تسجيل الدخول
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),  // تأكد من تعديل هذا ليفتح شاشة تسجيل الدخول الخاصة بك.
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: press,
+      onTap: _onTap,  // استبدال الضغط باستخدام الدالة _onTap
       leading: CircleAvatar(
         radius: 28,
-        child: NetworkImageWithLoader(
-          imageSrc,
-          radius: 100,
-        ),
+        child: Icon(
+                Icons.person,  // أيقونة المستخدم
+                size: 28,
+                color: const Color.fromARGB(255, 0, 0, 0),  // لون الأيقونة
+              ),
+            
       ),
       title: Row(
         children: [
           Text(
-            isShowHi ? "هلا, $name" : name,
+            isLoggedIn ? "هلا, ${widget.name}" : "تسجيل الدخول", // إظهار "هلا" أو "تسجيل الدخول"
             style: const TextStyle(fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(width: defaultPadding / 2),
-          if (isPro)
+          if (widget.isPro)
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: defaultPadding / 2, vertical: defaultPadding / 4),
@@ -52,7 +100,7 @@ class ProfileCard extends StatelessWidget {
                     BorderRadius.all(Radius.circular(defaultBorderRadious)),
               ),
               child: Text(
-                proLableText,
+                widget.proLableText,
                 style: const TextStyle(
                   fontFamily: grandisExtendedFont,
                   fontSize: 10,
@@ -65,8 +113,39 @@ class ProfileCard extends StatelessWidget {
             ),
         ],
       ),
-      subtitle: Text(email),
-      trailing: isShowArrow
+      subtitle: isLoggedIn
+          ? Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "رقم الجوال: $phoneNumber",
+                style: TextStyle(
+                  color: Colors.blue.shade800,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            )
+          : ElevatedButton(
+              onPressed: _onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text(
+                "تسجيل الدخول",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+      trailing: widget.isShowArrow
           ? SvgPicture.asset(
               "assets/icons/miniRight.svg",
               color: Theme.of(context).iconTheme.color!.withOpacity(0.4),

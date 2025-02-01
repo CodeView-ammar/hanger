@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop/components/skleton/others/offers_skelton.dart';
 
 import 'offers_carousel.dart';
 

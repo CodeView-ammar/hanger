@@ -12,7 +12,7 @@ class ProductModel {
   final String name;
   final String? address;
   final String? image;
-  final double? x_latitude; 
+  final double? x_latitude;
   final double? y_longitude;
 
   ProductModel({
@@ -58,15 +58,15 @@ class LocationService {
     } else {
       throw Exception('فشل تحميل المسافة والوقت');
     }
-    
+
     return null;
   }
 
   Future<Map<String, double?>> getCurrentLocation() async {
-final prefs = await SharedPreferences.getInstance();
-      // جلب الموقع المحفوظ في SharedPreferences
-  double? savedLatitude = prefs.getDouble('latitude');
-  double? savedLongitude = prefs.getDouble('longitude');
+    final prefs = await SharedPreferences.getInstance();
+    // جلب الموقع المحفوظ في SharedPreferences
+    double? savedLatitude = prefs.getDouble('latitude');
+    double? savedLongitude = prefs.getDouble('longitude');
     return {
       'latitude': savedLatitude,
       'longitude': savedLongitude,
@@ -94,13 +94,18 @@ class _BestSellersState extends State<BestSellers> {
   @override
   void initState() {
     super.initState();
-    _fetchedProducts = fetchProducts(page: _currentPage);
-    _getUserLocation();
+  try{
+
+      _fetchedProducts = fetchProducts(page: _currentPage);
+      _getUserLocation();
+  }catch(e){
+    print(e);
+  }
   }
 
   Future<void> _getUserLocation() async {
     var userLocation = await _locationService.getCurrentLocation();
-    if (mounted) {
+    if (mounted) { // تحقق من أن الـ widget لا يزال موجودًا في الشجرة
       setState(() {
         _userLatitude = userLocation['latitude'];
         _userLongitude = userLocation['longitude'];
@@ -122,7 +127,7 @@ class _BestSellersState extends State<BestSellers> {
   }
 
   Future<List<ProductModel>> fetchProducts({int page = 1}) async {
-    final response = await http.get(Uri.parse("${APIConfig.launderiesEndpoint}?page=$page"));
+    final response = await http.get(Uri.parse("${APIConfig.launderiesEndpoint}"));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => ProductModel.fromJson(item)).toList();
@@ -138,17 +143,21 @@ class _BestSellersState extends State<BestSellers> {
 
     try {
       final refreshedProducts = await fetchProducts(page: 1);
-      setState(() {
-        _currentPage = 1;
-        _allProducts = refreshedProducts;
-        _displayedProducts = _allProducts.take(10).toList();
-      });
+      if (mounted) {
+        setState(() {
+          _currentPage = 1;
+          _allProducts = refreshedProducts;
+          _displayedProducts = _allProducts.take(10).toList();
+        });
+      }
     } catch (e) {
       print("خطأ في تحديث المنتجات: $e");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -160,16 +169,20 @@ class _BestSellersState extends State<BestSellers> {
 
     try {
       final moreProducts = await fetchProducts(page: _currentPage + 1);
-      setState(() {
-        _currentPage++;
-        _allProducts.addAll(moreProducts);
-      });
+      if (mounted) {
+        setState(() {
+          _currentPage++;
+          _allProducts.addAll(moreProducts);
+        });
+      }
     } catch (e) {
       print("خطأ في تحميل المزيد من المنتجات: $e");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -177,54 +190,55 @@ class _BestSellersState extends State<BestSellers> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: _refreshProducts,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              "الاقرب لكم",
-              style: Theme.of(context).textTheme.titleSmall,
+      child: SingleChildScrollView( // إضافة SingleChildScrollView هنا
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                "الاقرب لكم",
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             ),
-          ),
-       
-          FutureBuilder<List<ProductModel>>(
-            future: _fetchedProducts,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final demoBestSellersProducts = snapshot.data!;
-                if (_currentPage == 1) {
-                  _allProducts = demoBestSellersProducts;
-                  _displayedProducts = _allProducts.take(10).toList();
+            FutureBuilder<List<ProductModel>>(
+              future: _fetchedProducts,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final demoBestSellersProducts = snapshot.data!;
+                  if (_currentPage == 1) {
+                    _allProducts = demoBestSellersProducts;
+                    _displayedProducts = _allProducts.take(10).toList();
+                  }
+                  return Column(
+                    children: [
+                      _buildProductList(_displayedProducts),
+                      if (!_isLoading)
+                        TextButton(
+                          onPressed: _loadMore,
+                          child: const Text("عرض المزيد"),
+                        ),
+                      if (_isLoading)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: CircularProgressIndicator(),
+                        ),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('خطأ: ${snapshot.error}'),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
-                return Column(
-                  children: [
-                    _buildProductList(_displayedProducts),
-                    if (!_isLoading)
-                      TextButton(
-                        onPressed: _loadMore,
-                        child: const Text("عرض المزيد"),
-                      ),
-                    if (_isLoading)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: CircularProgressIndicator(),
-                      ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('خطأ: ${snapshot.error}'),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -245,42 +259,42 @@ class _BestSellersState extends State<BestSellers> {
           ),
           child: GestureDetector(
             onTap: () async {
-  final distanceData = await _getDistanceAndDuration(products[index]);
-  if (distanceData != null) {
-    Navigator.pushNamed(
-      context,
-      productDetailsScreenRoute,
-                arguments: {
-                  "isAvailable": index.isEven,
-                  "id": products[index].id,
-                  "name": products[index].name,
-                  "image": products[index].image,
-                  "address": products[index].address,
-                  "latitude": products[index].x_latitude,
-                  "longitude": products[index].y_longitude,
-                  "distance": distanceData['distance'], // إضافة المسافة
-                  "duration": distanceData['duration'], // إضافة الوقت
-                },
-              );
-            } else {
-              // معالجة الحالة عندما تكون بيانات المسافة غير متاحة
-              Navigator.pushNamed(
-                context,
-                productDetailsScreenRoute,
-                arguments: {
-                  "isAvailable": index.isEven,
-                  "id": products[index].id,
-                  "name": products[index].name,
-                  "image": products[index].image,
-                  "address": products[index].address,
-                  "latitude": products[index].x_latitude,
-                  "longitude": products[index].y_longitude,
-                  "distance": null,
-                  "duration": null,
-                },
-              );
-            }
-          },
+              final distanceData = await _getDistanceAndDuration(products[index]);
+              if (distanceData != null) {
+                Navigator.pushNamed(
+                  context,
+                  productDetailsScreenRoute,
+                  arguments: {
+                    "isAvailable": index.isEven,
+                    "id": products[index].id,
+                    "name": products[index].name,
+                    "image": products[index].image,
+                    "address": products[index].address,
+                    "latitude": products[index].x_latitude,
+                    "longitude": products[index].y_longitude,
+                    "distance": distanceData['distance'], // إضافة المسافة
+                    "duration": distanceData['duration'], // إضافة الوقت
+                  },
+                );
+              } else {
+                // معالجة الحالة عندما تكون بيانات المسافة غير متاحة
+                Navigator.pushNamed(
+                  context,
+                  productDetailsScreenRoute,
+                  arguments: {
+                    "isAvailable": index.isEven,
+                    "id": products[index].id,
+                    "name": products[index].name,
+                    "image": products[index].image,
+                    "address": products[index].address,
+                    "latitude": products[index].x_latitude,
+                    "longitude": products[index].y_longitude,
+                    "distance": null,
+                    "duration": null,
+                  },
+                );
+              }
+            },
             child: Container(
               height: 80,
               decoration: BoxDecoration(
@@ -326,11 +340,14 @@ class _BestSellersState extends State<BestSellers> {
                             style: const TextStyle(fontSize: 16, color: Colors.white),
                           ),
                           const SizedBox(height: 5),
-                          FutureBuilder<Map<String, dynamic>?>(
+                          FutureBuilder<Map<String, dynamic>?>( 
                             future: _getDistanceAndDuration(products[index]),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const CircularProgressIndicator();
+                                return const Text(
+                                  'قيد التحميل...', // عرض "قيد التحميل" أثناء الانتظار
+                                  style: TextStyle(fontSize: 14, color: Colors.white),
+                                );
                               } else if (snapshot.hasData) {
                                 final distance = snapshot.data!['distance'];
                                 final duration = snapshot.data!['duration'];
@@ -353,7 +370,7 @@ class _BestSellersState extends State<BestSellers> {
                                 );
                               } else {
                                 return Text(
-                                  'غير متوفر',
+                                  'غير متوفر', // في حال كانت البيانات غير متاحة
                                   style: const TextStyle(fontSize: 14, color: Colors.white),
                                 );
                               }

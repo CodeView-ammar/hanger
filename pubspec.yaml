@@ -37,6 +37,7 @@ dependencies:
       url: https://github.com/GeideaSolutions/Flutter-SDK
       ref: main # branch name
   sms_autofill: ^2.4.1
+  flutter_local_notifications: ^18.0.1
   
   
 

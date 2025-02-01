@@ -25,6 +25,7 @@ class _EntryPointState extends State<EntryPoint> {
     ProfileScreen(),
   ];
 
+
   int _currentIndex = 0;
   int activeStep = 0;
   Timer? _timer;
@@ -33,6 +34,7 @@ class _EntryPointState extends State<EntryPoint> {
   void initState() {
     super.initState();
     _startFetchingOrderStatus(); // بدء العملية لجلب حالة الطلب
+  
   }
 
   @override
@@ -75,9 +77,7 @@ class _EntryPointState extends State<EntryPoint> {
       } else {
         print("حالة الطلب غير متاحة");
       }
-    } else {
-      print("فشل في جلب حالة الطلب: ${response.statusCode}");
-    }
+    } 
     }
   }
 

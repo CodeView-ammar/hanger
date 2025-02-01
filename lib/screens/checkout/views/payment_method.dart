@@ -6,7 +6,8 @@ import 'package:shop/components/api_extintion/url_api.dart';
 import 'package:shop/screens/checkout/tools/add_card_screen.dart';
 
 class AddCardDetailsScreen extends StatefulWidget {
-  const AddCardDetailsScreen({Key? key}) : super(key: key);
+  final String name_windows;
+  const AddCardDetailsScreen({Key? key, required this.name_windows}) : super(key: key);
 
   @override
   _AddCardDetailsScreenState createState() => _AddCardDetailsScreenState();
@@ -15,7 +16,7 @@ class AddCardDetailsScreen extends StatefulWidget {
 class _AddCardDetailsScreenState extends State<AddCardDetailsScreen> {
   double? totalAmount;
   int laundryId =0; 
-
+  int? orderId;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -24,10 +25,11 @@ class _AddCardDetailsScreenState extends State<AddCardDetailsScreen> {
     if (args != null && args.length >= 2) {
       totalAmount = args[0] as double; // استلام المبلغ
       laundryId= args[1] as int; // استلام ID المغسلة
+      orderId= args[1] as int; // استلام ID المغسلة
+      
     }
   }
-
-  Future<void> addPaymentMethod(String name, String description, BuildContext context) async {
+   Future<void> addPaymentMethod(String name, String description, BuildContext context) async {
     final url = Uri.parse(APIConfig.addPaymentUrl);
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');
@@ -109,12 +111,13 @@ class _AddCardDetailsScreenState extends State<AddCardDetailsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddCardScreen(total: totalAmount ?? 0.0, laundryId:laundryId), // ضمان عدم تمرير null
+                          builder: (context) => AddCardScreen(name_windows: widget.name_windows,total: totalAmount ?? 0.0, laundryId:laundryId), // ضمان عدم تمرير null
                         ),
+                        
                       );
                     },
                   ),
-                  const Divider(),
+                  const Divider()
                 ],
               ),
             ),
